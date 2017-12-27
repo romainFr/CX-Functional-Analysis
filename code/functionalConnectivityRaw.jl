@@ -14,10 +14,10 @@ using PrairieFunctionalConnectivity
 
 ############################################## Parameters definition ###########
 ## Where the labbook table is :
-tablePath = "../labbookTable.csv"
+tablePath = "labbookTable.csv"
 
 ### Where the data is :
-baseDataFolder =  "../../smb/smb-share:server=dm11,share=jayaramanlab/DATA/Romain/LALConnectivityProject/"
+baseDataFolder =  "../smb/smb-share:server=dm11,share=jayaramanlab/DATA/Romain/LALConnectivityProject/"
 
 ### Which experimental day we want to process (or nothing if we want to process everything), this is usually passed by argument.
 #expday=nothing
@@ -30,15 +30,15 @@ toUpdate = true
 
 problemFolders = String[]
 
-linesToType = readtable("../LinesAndTypes.csv")
+linesToType = readtable("LinesAndTypes.csv")
 (mainTab,subTab) = PrairieFunctionalConnectivity.readLabbook(tablePath,expDay=expday)
 
 if toUpdate == false
     fullDf = Dict()
     images = Dict()
 else
-    fullDf = JLD.load("../data/rawData.jld")
-    images = JLD.load("../data/expImages.jld")
+    fullDf = JLD.load("data/rawData.jld")
+    images = JLD.load("data/expImages.jld")
 end
 
 for i in (1:size(subTab)[1])
@@ -185,7 +185,7 @@ end
 ## Adding some columns to the labbook and cleaning it for further use
 info("Export results")
 mainTab = mainTab[isna.(mainTab[:TAGS]),:]
-mainTab = labbook_extend(mainTab,"../LinesAndTypes.csv")
+mainTab = labbook_extend(mainTab,"LinesAndTypes.csv")
 mainTab[:timesToDrug]=Array{Array,1}(size(mainTab,1))
 
 for k in keys(fullDf)
@@ -193,7 +193,7 @@ for k in keys(fullDf)
     [[kdct[2]["timeToDrug"][1] for kdct in fullDf[k]] for k in keys(fullDf)][1]
 end
 
-JLD.save("../data/rawData.jld",fullDf)
-JLD.save("../data/expImages.jld",images)
+JLD.save("data/rawData.jld",fullDf)
+JLD.save("data/expImages.jld",images)
 
-JLD.save("../data/labbookTable.jld","df",mainTab)
+JLD.save("data/labbookTable.jld","df",mainTab)
