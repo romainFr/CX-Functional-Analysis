@@ -21,8 +21,12 @@ baseDataFolder =  "../smb/smb-share:server=dm11,share=jayaramanlab/DATA/Romain/L
 
 ### Which experimental day we want to process (or nothing if we want to process everything), this is usually passed by argument.
 #expday=nothing
-expday = ARGS
-
+if length(ARGS) == 0
+    expday = nothing
+else
+    expday = ARGS
+end
+println(expday)
 ### If true, just add the processed entry to the existing table, otherwise creates a new table from scratch
 toUpdate = true
 #toUpdate = false
