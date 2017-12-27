@@ -6,9 +6,9 @@ using DataStructures
 using Distances,Bootstrap
 
 ## Load the labbook, the lines description table and the fluorescence data
-labbook_table = JLD.load("labbookTable.jld")["df"];
-linesToType = readtable("LinesAndTypes.csv");
-full_data_dict = JLD.load("rawData.jld");
+labbook_table = JLD.load("../data/labbookTable.jld")["df"];
+linesToType = readtable("../LinesAndTypes.csv");
+full_data_dict = JLD.load("../data/rawData.jld");
 
 ## An per run average version of the fluorescence data (to make figures)
 avg_data_dict = map(full_data_dict) do full  
@@ -17,7 +17,7 @@ avg_data_dict = map(full_data_dict) do full
         f in full]
     Pair(k,meanSignals)    
 end;
-JLD.save("avgData.jld",avg_data_dict)
+JLD.save("../data/avgData.jld",avg_data_dict)
 
 ## Interpolating those averaged runs (useful to compute correlations)
 function interpolate_run(run,time_axis)
