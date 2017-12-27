@@ -1,19 +1,25 @@
 {
-  "CodeDependencies": [], 
+  "CodeDependencies": [
+    "code/functionalConnectivityRaw.jl"
+  ], 
   "OutputFiles": [
-    "../data/rawData.jld"
+    "data/labbookTable.jld", 
+    "data/expImages.jld", 
+    "data/rawData.jld"
   ], 
   "Version": "0.1", 
-  "Command": "import-file", 
+  "Command": "run", 
   "Stderr": null, 
   "InputFiles": [], 
   "Type": "DVC-State", 
-  "Cwd": "code", 
+  "Cwd": ".", 
   "Shell": false, 
   "Stdout": null, 
   "Argv": [
-    "/localhome/romain/Desktop/rawData.jld", 
-    "data/rawData.jld"
+    "julia", 
+    "-p", 
+    "25", 
+    "code/functionalConnectivityRaw.jl"
   ], 
-  "CreatedAt": "2017-12-27 17:39:14 -0500"
+  "CreatedAt": "2017-12-27 17:47:55 -0500"
 }
