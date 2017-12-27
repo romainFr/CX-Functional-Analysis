@@ -1,54 +1,47 @@
 ## We first load the fluorescence analysis Package, together with the labbook related functions
-#using dynamicFluo
+## using dynamicFluo. This script reads the data, detects the ROIs and returns the results in a
+## Dictionnary. To be used on the command line (ideally in parallel) with "julia -p X functionalConnectivityRaw.jl nameOfFolderToAnalyze"
+## If argument is omitted, all runs are analyzed.
+
 using JLD
 using DataFrames
-using subpixelRegistration
 using Images
 using FileIO,ImageMagick
+using subpixelRegistration
 using FluorescentSeries
 using Unitful
 using PrairieFunctionalConnectivity
 
 ############################################## Parameters definition ###########
 ## Where the labbook table is :
-tablePath = "PairsForConnectivity.csv"
+tablePath = "../labbookTable.csv"
 
 ### Where the data is :
 baseDataFolder =  "../../smb/smb-share:server=dm11,share=jayaramanlab/DATA/Romain/LALConnectivityProject/"
 
-### Which experimental day we want to process (or nothing if we want to process everything) :
+### Which experimental day we want to process (or nothing if we want to process everything), this is usually passed by argument.
 #expday=nothing
-expday = ARGS##["jul0617"]
+expday = ARGS
 
-### Correct for movement artefacts in individual runs?
-@everywhere mvtCorrect = false
-
-### Apply a clustering step after detecting the fluorescent regions (analysis gets pretty slow when true) :
-dynclust = false
-
-### DF of all results
+### If true, just add the processed entry to the existing table, otherwise creates a new table from scratch
 toUpdate = true
 #toUpdate = false
 #################################################################################
 
 problemFolders = String[]
 
-linesToType = readtable("LinesAndTypes.csv")
+linesToType = readtable("../LinesAndTypes.csv")
 (mainTab,subTab) = PrairieFunctionalConnectivity.readLabbook(tablePath,expDay=expday)
 
 if toUpdate == false
     fullDf = Dict()
     images = Dict()
 else
-    fullDf = JLD.load("rawData.jld")
-    images = JLD.load("expImages.jld")
+    fullDf = JLD.load("../data/rawData.jld")
+    images = JLD.load("../data/expImages.jld")
 end
 
 for i in (1:size(subTab)[1])
-
-    if subTab[i,:][:TAGS] == ":Movement:"
-        mvtCorrect=true
-    end
 
     genotypePre = subTab[Symbol(subTab[:ActivatorExp][i])][i]
     genotypePost = subTab[:ActivatorExp][i] == "Gal4" ? subTab[:LexA][i] : subTab[:Gal4][i]
@@ -69,7 +62,7 @@ for i in (1:size(subTab)[1])
         drugStart = DataFrames.NA
     end
 
-    println(expName)
+    info(expName)
 
     if length(fly) == 0
         println("Nothing in there")
@@ -77,11 +70,13 @@ for i in (1:size(subTab)[1])
         continue
     end
     ## Load all the data to get the baseline and the ROIs
-    runFluos = pmap(fly) do run
+    info("Load data")
+    runFluos = map(fly) do run
         gc()
-        roiDict = PrairieFunctionalConnectivity.runExtract(run,mvtCorrect=mvtCorrect)
+        roiDict = PrairieFunctionalConnectivity.runExtract(run,mvtCorrect=false)
     end
-
+    info("Loaded")
+    
     ## Checking for inhomogenous ROIs
     if any(runFluos .== "Run not completed")
         println("Bad runs selection, one couldn't be loaded")
@@ -96,12 +91,17 @@ for i in (1:size(subTab)[1])
     end
     ## Alignment of the different runs, relatively low resolution (so pixel statistics are not affected)
     #repeatsDft = Array(Array{Dict},length(runFluos)-1)
+    info("Align runs")
     maxShiftPos = [0;0]
     maxShiftNeg = [0;0]
+
+   
+    shifts = zeros(2,length(runFluos)-1)
     for run in 1:(length(runFluos)-1)
         registration = stackDftReg(runFluos[run]["av"],ref=runFluos[length(runFluos)]["av"],ufac=1)
-        maxShiftPos = round(Int64,maximum([maxShiftPos registration["shift"]],2))
-        maxShiftNeg = round(Int64,minimum([maxShiftNeg registration["shift"]],2))
+        #maxShiftPos = round.(Int64,maximum([maxShiftPos registration["shift"]],2))
+        #maxShiftNeg = round.(Int64,minimum([maxShiftNeg registration["shift"]],2))
+        shifts[:,run] = round.(Int64,registration["shift"])
         ## Align the grand averages
         runFluos[run]["av"] = alignFromDict(runFluos[run]["av"],registration)
         ## Align the run averages (those are "volumes" so we need to set the z shift to 0)
@@ -112,6 +112,9 @@ for i in (1:size(subTab)[1])
             runFluos[run]["green"][rep][:,:,:] = alignFromDict(runFluos[run]["green"][rep],registration)
         end
     end
+    maxShiftPos = round.(Int64,maximum([[0;0] shifts],2))
+    maxShiftNeg = round.(Int64,minimum([[0;0] shifts],2))
+    
     ## Cropping everything to the area common to all repeats // catch time to drug
     cropRegion = [(1+maxShiftPos[i]):(size(runFluos[1]["av"])[i]+maxShiftNeg[i]) for i in 1:2]
     for run in 1:length(runFluos)
@@ -126,11 +129,12 @@ for i in (1:size(subTab)[1])
             runFluos[run]["timeToDrug"] = DataFrames.NA
         end
     end
-
+    info("Aligned")
     ## Average of all the repeats
     grdAv = mapreduce(x -> x["av"],+,runFluos)/length(runFluos) ##*(2^16)
     #grdAv = AxisArray(grdAv,
 
+    info("Get ROIs")
     using Clustering
     function kMeansIm(img,nl)
         imgR = reshape(img,(size(img)[1]*size(img)[2],nimages(img))).'
@@ -142,8 +146,8 @@ for i in (1:size(subTab)[1])
         roi
     end
     fluorescentRegions = kMeansIm(grdAv,2)
-
-
+    
+    info("Compute fluorescence")
     fluoSimple = [cat(3,[FluorescentSerie(rep,fluorescentRegions) for rep in runF["green"]]...) for runF in runFluos]
     fluoParams = [Dict("pulseNumber" => runF["pulseNumber"],"timeToDrug" => runF["timeToDrug"],"stimIntensity"=>runF["stimIntensity"]) for runF in runFluos]
     ## Find the global F0 as the median of the 3% dimmer pixels ?
@@ -178,8 +182,18 @@ for i in (1:size(subTab)[1])
     images["$(subTab[:folderName][i])-Fly$(getFlyN(subTab[i,:],mainTab))-$(subTab[:Region][i])"] = Dict("average_image"=> grdAv,"ROIs"=> fluorescentRegions)
 end
 
-#JLD.save("rawDataLocal.jld",fullDfLocal)
-JLD.save("rawData.jld",fullDf)
-JLD.save("expImages.jld",images)
+## Adding some columns to the labbook and cleaning it for further use
+info("Export results")
+mainTab = mainTab[isna.(mainTab[:TAGS]),:]
+mainTab = labbook_extend(mainTab,"../LinesAndTypes.csv")
+mainTab[:timesToDrug]=Array{Array,1}(size(mainTab,1))
 
-JLD.save("labbookTable.jld","df",mainTab)
+for k in keys(fullDf)
+     mainTab[findfirst(mainTab[:keyEntry].==k),:timesToDrug] =
+    [[kdct[2]["timeToDrug"][1] for kdct in fullDf[k]] for k in keys(fullDf)][1]
+end
+
+JLD.save("../data/rawData.jld",fullDf)
+JLD.save("../data/expImages.jld",images)
+
+JLD.save("../data/labbookTable.jld","df",mainTab)
