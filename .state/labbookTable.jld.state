@@ -1,0 +1,19 @@
+{
+  "CodeDependencies": [], 
+  "OutputFiles": [
+    "../data/labbookTable.jld"
+  ], 
+  "Version": "0.1", 
+  "Command": "import-file", 
+  "Stderr": null, 
+  "InputFiles": [], 
+  "Type": "DVC-State", 
+  "Cwd": "code", 
+  "Shell": false, 
+  "Stdout": null, 
+  "Argv": [
+    "/localhome/romain/Desktop/labbookTable.jld", 
+    "data/labbookTable.jld"
+  ], 
+  "CreatedAt": "2017-12-27 17:39:24 -0500"
+}
