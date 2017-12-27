@@ -1,0 +1,19 @@
+{
+  "CodeDependencies": [], 
+  "OutputFiles": [
+    "../data/expImages.jld"
+  ], 
+  "Version": "0.1", 
+  "Command": "import-file", 
+  "Stderr": null, 
+  "InputFiles": [], 
+  "Type": "DVC-State", 
+  "Cwd": "code", 
+  "Shell": false, 
+  "Stdout": null, 
+  "Argv": [
+    "/localhome/romain/Desktop/expImages.jld", 
+    "data/expImages.jld"
+  ], 
+  "CreatedAt": "2017-12-27 17:39:37 -0500"
+}
