@@ -188,16 +188,16 @@ end
 
 ## Adding some columns to the labbook and cleaning it for further use
 info("Export results")
-mainTab = mainTab[isna.(mainTab[:TAGS]),:]
+JLD.save("data/rawData.jld",fullDf)
+JLD.save("data/expImages.jld",images)
+
+info("Export labbook")
 mainTab = labbook_extend(mainTab,"LinesAndTypes.csv")
+mainTab = mainTab[isna.(mainTab[:TAGS]),:]
 mainTab[:timesToDrug]=Array{Array,1}(size(mainTab,1))
 
 for k in keys(fullDf)
-     mainTab[findfirst(mainTab[:keyEntry].==k),:timesToDrug] =
-    [[kdct[2]["timeToDrug"][1] for kdct in fullDf[k]] for k in keys(fullDf)][1]
+     mainTab[findfirst(mainTab[:keyEntry].==k),:timesToDrug] = [kdct[2]["timeToDrug"] for kdct in fullDf[k]]
 end
-
-JLD.save("data/rawData.jld",fullDf)
-JLD.save("data/expImages.jld",images)
 
 JLD.save("data/labbookTable.jld","df",mainTab)
