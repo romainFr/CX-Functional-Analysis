@@ -17,7 +17,7 @@ using PrairieFunctionalConnectivity
 tablePath = "labbookTable.csv"
 
 ### Where the data is :
-baseDataFolder =  "../smb/smb-share:server=dm11,share=jayaramanlab/DATA/Romain/LALConnectivityProject/"
+baseDataFolder =  "../dmHere/DATA/Romain/LALConnectivityProject/"
 
 ### Which experimental day we want to process (or nothing if we want to process everything), this is usually passed by argument.
 #expday=nothing
