@@ -94,27 +94,27 @@ for i in (1:size(subTab)[1])
         continue
     end
     ## Alignment of the different runs, relatively low resolution (so pixel statistics are not affected)
-    #repeatsDft = Array(Array{Dict},length(runFluos)-1)
     info("Align runs")
-    maxShiftPos = [0;0]
-    maxShiftNeg = [0;0]
 
-   
-    shifts = zeros(2,length(runFluos)-1)
-    for run in 1:(length(runFluos)-1)
-        registration = stackDftReg(runFluos[run]["av"],ref=runFluos[length(runFluos)]["av"],ufac=1)
-        #maxShiftPos = round.(Int64,maximum([maxShiftPos registration["shift"]],2))
-        #maxShiftNeg = round.(Int64,minimum([maxShiftNeg registration["shift"]],2))
+    #shifts = zeros(2,length(runFluos)-1)
+    shifts = SharedArray{Int64}(2,length(runFluos)-1)
+    ref = convert(SharedArray,runFluos[length(runFluos)]["av"])
+
+    runFluos[1:(length(runFluos)-1)] = pmap(runFluos[1:(length(runFluos)-1)],1:(length(runFluos)-1)) do rF,run
+        #for run in 1:(length(runFluos)-1)
+        registration = subpixelRegistration.stackDftReg(rF["av"],ref=ref,ufac=1)
+        #registration = stackDftReg(runFluos[run]["av"],ref=runFluos[length(runFluos)]["av"],ufac=1)
         shifts[:,run] = round.(Int64,registration["shift"])
         ## Align the grand averages
-        runFluos[run]["av"] = alignFromDict(runFluos[run]["av"],registration)
+        rF["av"] = subpixelRegistration.alignFromDict(rF["av"],registration)
         ## Align the run averages (those are "volumes" so we need to set the z shift to 0)
         registration["shift"] = [registration["shift"];0]
-        runFluos[run]["runAv"] = alignFromDict(runFluos[run]["runAv"],registration)
+        rF["runAv"] = subpixelRegistration.alignFromDict(rF["runAv"],registration)
         ## Finally align the individual runs
-        for rep in 1:length(runFluos[run]["green"])
-            runFluos[run]["green"][rep][:,:,:] = alignFromDict(runFluos[run]["green"][rep],registration)
+        for rep in 1:length(rF["green"])
+            rF["green"][rep][:,:,:] = subpixelRegistration.alignFromDict(rF["green"][rep],registration)
         end
+        rF
     end
     maxShiftPos = round.(Int64,maximum([[0;0] shifts],2))
     maxShiftNeg = round.(Int64,minimum([[0;0] shifts],2))
