@@ -5,13 +5,13 @@ using PlotUtils, RecipesBase, StatPlots
 using LaTeXStrings, Measures
 plotlyjs(gridcolor=:gray40,axiscolor=:gray50,
    textcolor=RGB(128/255,128/255,128/255),guidecolor=RGB(128/25,128/255,128/255),
-    guidefontfamily="DejaVu Sans",guidefontsize=14,guidefontcolor=RGB(128/255,128/255,128/255) ,tickfont = ("DejaVu Sans",12))
+    guidefontfamily="DejaVu Sans",guidefontsize=10,guidefontcolor=RGB(128/255,128/255,128/255) ,tickfont = ("DejaVu Sans",10))
 
-labbook_table = JLD.load("labbookTable.jld")["df"];
+labbook_table = JLD.load("data/labbookTable.jld")["df"];
 
-avg_data_dict = JLD.load("avgData.jld");
+avg_data_dict = JLD.load("data/avgData.jld");
 
-@load "statTables.jld"
+@load "data/statTables.jld"
 
 cellPairs = sort(unique(labbook_table[isna.(labbook_table[:TAGS]),:cellToCell]))
 genotypes = sort(unique(labbook_table[isna.(labbook_table[:TAGS]),:genotypeRegion]));
@@ -117,12 +117,12 @@ figureResponseA = plot(excPlot,inhPlot,nothingPlot,weakPlot,confPlot,reboundPlot
         title = ["i" "ii" "iii" "i" "ii" "iii"],titleloc=:left,top_margin=Measures.Length(:mm,30.0)
     ,size = (1000,600),bottom_margin=Measures.Length(:mm,15.0),link=:x)
 ## The top margin is to fit neuron schematics
-savefig(figureResponseA,"figureResponseAPlots.svg")
+savefig(figureResponseA,"plots/figureResponseAPlots.svg")
 
 ## Plotting the control experiments
 null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:cellPair]))
 figureResponseDi = make_raw_plot(select_data(null_pairs,20,avg_data_dict,1:6,labbook_table),substract=true,scalebar=true,framestyle=:axes,axis=:y,xlims=(-2,10),colorV=:cellPair,traceW=1,size=(400,350))
-savefig(figureResponseDi,"figureResponseDi.svg")
+savefig(figureResponseDi,"plots/figureResponseDi.svg")
 
 fullNamesDF = DataFrame(integNorm = "Normalized integral", 
                         integNormScaled = "Scaled normalized integral",
@@ -164,27 +164,27 @@ statLayout[1,2].attr[:blank]=true
 statPlot = plot(layout=statLayout,size=(500,450),xlabel="",ylabel="",grid=true)
 
 makeStatHist!(stats_per_pair_20,statPlot,:repeats_corr,subplot=1,legend=:none,grid=false,link=:x,axis=:x,ticks=nothing)
-makeStatHist!(stats_per_pair_20,statPlot,:integNormScaled,subplot=3,orientation=:h,legend=:none,grid=false,ylim=(-1.05,1),
+makeStatHist!(stats_per_pair_20,statPlot,:integNormScaled,subplot=3,orientation=:h,legend=:none,grid=false,ylim=(-1.05,1.05),
     xlim = (0,18),axis=:y,ticks=nothing)
 
 scatter!(statPlot,stats_per_pair_20[:repeats_corr],stats_per_pair_20[:integNormScaled],group=stats_per_pair_20[:expType],
-         msw=stats_per_pair_20[:signif1],msa=1,malpha=[0.8 0.3 0.3],msc=:gray30,
-         ylab="Scaled normalized integral",xlab="Repeat to repeat correlation",
-         hover=stats_per_pair_20[:cellPair],subplot=2,msize=6,ylim=(-1.05,1),link=:x,color=["cornflowerblue" "coral" "green"])
+         msw=stats_per_pair_20[:signif5],msa=1,malpha=[0.8 0.3 0.3],msc=:gray30,
+         ylab="Scaled normalized integral",xlab="Within-flies correlation",
+         hover=stats_per_pair_20[:cellPair],subplot=2,msize=6,ylim=(-1.05,1.05),link=:x,color=["cornflowerblue" "coral" "green"])
     #scatter!([null_mean[2]],[null_mean[1]],markershape=:cross,subplot=2)
     
 
 ## There's still a hack in here, because orientation switching does weird things with plotlyjs (axis limits and 
 ## axis names don't match)
 
-savefig(statPlot,"figureResponsesDii.svg")
+savefig(statPlot,"plots/figureResponsesDii.svg")
     
 statHists = [makeStatHist(stats_per_pair_20,s) for s in names(fullNamesDF)[1:10]]
 
 statsHistsGridBig = plot(statHists...,layout=(2,5),size=(2500,1500),legend=:none,
     margin=Measures.Length(:mm,10.0))
 
-savefig(statsHistsGridBig,"statistics_histograms_SI.svg")
+savefig(statsHistsGridBig,"plots/statistics_histograms_SI.svg")
 
 function remap(vals)
     remapped = zeros(Int, length(vals))
@@ -226,7 +226,7 @@ end
 
 matDistance = makeMatrixPlot("distanceN")
 
-PlotlyJS.savefig(matDistance.o,"matDistance.svg")
+PlotlyJS.savefig(matDistance.o,"plots/matDistance.svg")
 
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:baseline_median,
     size=(1500,400),ylims=(0,10),group=:expType,ylabel="Single run baseline",
@@ -279,7 +279,7 @@ l=@layout [a
 baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figure2B...,layout=l,size=(1500,1300),
     margin=Measures.Length(:mm,10.0),title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=[:right :none :right :none :none :none])
 
-savefig(baselineSIFig,"baselineSIFig.svg")
+savefig(baselineSIFig,"plots/baselineSIFig.svg")
 
 doseRespPlot = @> stats_per_pair begin 
     @splitby (_.signif20,_.cellPair)
@@ -297,11 +297,11 @@ end
     @plot plot!(doseRespPlot,lw=4,color=[:blue :gray70 :red])
 end
 
-savefig(doseRespPlot,"doseRespSI.svg")
+savefig(doseRespPlot,"plots/doseRespSI.svg")
 
 #Blink.AtomShell.install()
 
-@load "drugTables.jld"
+@load "data/drugTables.jld"
 drugStats[:globalSignif]=stats_per_pair_20[:globalSignif][[findin(stats_per_pair_20[:cellPair],[s])[1] for s in drugStats[:cellPair]]];
 
 function makePairDrugPlots(df,cp,findFunc=findmin)
@@ -335,21 +335,47 @@ end
     pairPlot
 end
 
-mecaEffectPlots = [makePairDrugPlots(mecadf,cp) for cp in unique(mecadf[:cellPair])]
+#mecaEffectPlots = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[:cellPair]))]
 
-mecaPlots = plot(mecaEffectPlots...,layout=(8,2),size=(2500,4000),margin=3mm,
+mecaISP = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[mecadf[:preNeuron].=="PBG2-9.b-IB.s.SPS.s" ,:cellPair]))]
+
+mecaColu = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="PBG2-9.s-EBt.b-NO1.b.Type1").| (mecadf[:preNeuron].=="PBG1-7.s-FBl2.s-LAL.b-cre.b") .| (mecadf[:preNeuron].=="PBG1-8.b-EBw.s-DV_GA.b") .| (mecadf[:preNeuron].=="PBG1-8.s-EBt.b-DV_GA.b"),:cellPair]))]
+
+mecaOthers = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="EB.w-AMP.d-D_GAsurround").| (mecadf[:preNeuron].=="PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b") ,:cellPair]))]
+
+mecaPlotsColu = plot(mecaColu...,layout=(5,2),size=(2500,2500),margin=3mm,
       bottom_margin=15mm,titlefont=font("DejaVu Sans",10),
-    titlecolor=RGB(128/255,128/255,128/255))
+    titlecolor=RGB(128/255,128/255,128/255),legend=:none)
 
-savefig(mecaPlots,"mecaSI.svg")
+savefig(mecaPlotsColu,"plots/mecaColuSI.svg")
 
-picroEffectPlots = [makePairDrugPlots(picrodf,cp,findmax) for cp in unique(picrodf[:cellPair])]
+mecaPlotsISP = plot(mecaISP...,plot(),layout=(2,2),size=(2500,1000),margin=3mm,
+      bottom_margin=15mm,titlefont=font("DejaVu Sans",10),
+    titlecolor=RGB(128/255,128/255,128/255),legend=:none)
 
-picroPlots = plot(picroEffectPlots...,plot([]),layout=(7,2),size=(2500,3500),margin=3mm,
+savefig(mecaPlotsColu,"plots/mecaISPSI.svg")
+
+mecaPlotsOther = plot(mecaOthers...,layout=(1,2),size=(2500,500),margin=3mm,
+      bottom_margin=15mm,titlefont=font("DejaVu Sans",10),
+    titlecolor=RGB(128/255,128/255,128/255),legend=:none)
+
+savefig(mecaPlotsOther,"plots/mecaOtherSI.svg")
+
+#picroEffectPlots = [makePairDrugPlots(picrodf,cp,findmax) for cp in sort(unique(picrodf[:cellPair]))]
+
+picroInhib = [makePairDrugPlots(picrodf,cp,findmax) for cp in ["EBIRP I-O-LAL.s-to-PBG1-8.b-EBw.s-DV_GA.b","EBORP O-I-GA-Bulb-to-PBG1-8.b-EBw.s-DV_GA.b","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"]]
+
+picroControl = [makePairDrugPlots(picrodf,cp,findmax) for cp in ["PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-FBl1.b-NO3PM.b","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.b-IB.s.SPS.s","PBG2-9.b-IB.s.SPS.s-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG2-9.b-IB.s.SPS.s-to-PBG1-8.b-EBw.s-DV_GA.b"    ,"PBG2-9.b-IB.s.SPS.s-to-PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b" ,"PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","EB.w-AMP.d-D_GAsurround-to-PBG1-8.b-EBw.s-DV_GA.b"]]
+
+picroPlotsInhib = plot(picroInhib...,plot([]),layout=(3,2),size=(2500,1500),margin=3mm,
       bottom_margin=15mm,titlefont=font("DejaVu Sans",10),titlecolor=RGB(128/255,128/255,128/255),legend=:none)
 
+savefig(picroPlotsInhib,"plots/picroInhibSI.svg")
 
-savefig(picroPlots,"picroSI.svg")
+picroPlotsControl = plot(picroControl...,layout=(4,2),size=(2500,2000),margin=3mm,
+      bottom_margin=15mm,titlefont=font("DejaVu Sans",10),titlecolor=RGB(128/255,128/255,128/255),legend=:none)
+
+savefig(picroPlotsControl,"plots/picroControlSI.svg")
 
 inhibPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"
 excitPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-EBt.b-NO1.b.Type1"
