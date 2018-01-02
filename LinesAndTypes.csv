@@ -1,4 +1,4 @@
-Line,Type Name,New Type Name,Type Description,Supertype,Pre regions,Post regions,Comment,Pre regions fine,Post regions fine
+Line,Wolff Type Name,New Type Name,Type Description,Supertype,Pre regions,Post regions,Comment,Pre regions fine,Post regions fine
 87G07,4,P-F3N2d,PBG2-9.s-FBl3.b-NO2D.b,FB columnar,"FB,NO","PB,NO",,"FB3,NO2","PB2,PB3,PB4,PB5,PB6,PB7,PB8,PB9,NO2"
 85H06,1-2,P-F1N3,PBG2-9.s-FBl1.b-NO3PM.b,FB columnar,"FB,NO","PB,NO",,"FB1,NO3","PB2,PB3,PB4,PB5,PB6,PB7,PB8,PB9,NO3"
 60D05,8,E-PG,PBG1-8.b-EBw.s-DV_GA.b,EB columnar,"PB,GA",EB,,"PB1,PB2,PB3,PB4,PB5,PB6,PB7,PB8,GA",EB
