@@ -1,5 +1,5 @@
 ## We first load the fluorescence analysis Package, together with the labbook related functions
-## using dynamicFluo. This script reads the data, detects the ROIs and returns the results in a
+## This script reads the data, detects the ROIs and returns the results in a
 ## Dictionnary. To be used on the command line (ideally in parallel) with "julia -p X functionalConnectivityRaw.jl nameOfFolderToAnalyze"
 ## If argument is omitted, all runs are analyzed.
 
