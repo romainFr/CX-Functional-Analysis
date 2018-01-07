@@ -13,16 +13,16 @@ Code and instructions to reproduce all the analysis used to generate the figures
 ```
 - Download or clone this repository.
 - Download either some of the raw data (link) or more realistically the intermediate results tables by the downloading the ```results``` folder on [this OpenScienceFramework page](https://osf.io/vsa3z/)
-and put it in a ```data``` or ```results``` folder in this repository folder
+and put it in a ```data``` folder inside this repository folder
 
 ## Content, analysis pipeline
 
 The table ```LinesAndTypes.csv``` is identical to ```Table 1``` of the paper and contains about cell types and innervation patterns of the driver lines used in the study.
 The table ```labbookTable.csv``` is, well, a labbook (all the metadata necessary to run the analysis). Each row corresponds to one fly.
 
-The ```code``` folder contains three scripts (and soon notebooks for the corresponding scripts) :
-- 
--
--
+The ```code``` folder contains three scripts (and soon notebooks for the corresponding scripts), all meant to be run from the ```CX-Functional-Analysis``` folder :
+- ```functionalConnectivityRaw.jl```
+- ```StatsAndExports.jl```
+- ```makeFigures.jl```
 
 ## 
