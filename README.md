@@ -21,8 +21,11 @@ The table ```LinesAndTypes.csv``` is identical to ```Table 1``` of the paper and
 The table ```labbookTable.csv``` is, well, a labbook (all the metadata necessary to run the analysis). Each row corresponds to one fly.
 
 The ```code``` folder contains three scripts (and soon notebooks for the corresponding scripts), all meant to be run from the ```CX-Functional-Analysis``` folder :
-- ```functionalConnectivityRaw.jl```
+- ```functionalConnectivityRaw.jl``` 
 - ```StatsAndExports.jl```
 - ```makeFigures.jl```
+
+To summarize, the workflow is schematized as : 
+ ![analysis workflow](./AnalysisWorkflow.svg)
 
 ## 
