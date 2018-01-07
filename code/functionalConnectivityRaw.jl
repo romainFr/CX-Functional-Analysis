@@ -17,14 +17,14 @@ using PrairieFunctionalConnectivity
 tablePath = "labbookTable.csv"
 
 ### Where the data is :
-baseDataFolder =  "../dmHere/DATA/Romain/LALConnectivityProject/"
+baseDataFolder =  ARGS[1]#"../dmHere/DATA/Romain/LALConnectivityProject/"
 
 ### Which experimental day we want to process (or nothing if we want to process everything), this is usually passed by argument.
 #expday=nothing
-if length(ARGS) == 0
+if length(ARGS) == 1
     expday = nothing
 else
-    expday = ARGS
+    expday = ARGS[2:end]
 end
 println(expday)
 ### If true, just add the processed entry to the existing table, otherwise creates a new table from scratch
