@@ -21,11 +21,10 @@ The table ```LinesAndTypes.csv``` is identical to ```Table 1``` of the paper and
 The table ```labbookTable.csv``` is, well, a labbook (all the metadata necessary to run the analysis). Each row corresponds to one fly.
 
 The ```code``` folder contains three scripts (and soon notebooks for the corresponding scripts), all meant to be run from the ```CX-Functional-Analysis``` folder :
-- ```functionalConnectivityRaw.jl``` 
-- ```StatsAndExports.jl```
-- ```makeFigures.jl```
+- ```functionalConnectivityRaw.jl``` does the movement correction, ROI detection and computes the fluorescence traces from the raw data and returns the ```rawData.jld``` file (JLD is Julia's binary format) containing a Dictionary, with one entry per fly. The script takes command line arguments : the first one is the path to where the data is located on your computer. An arbitrary number of extra arguments can be passed to specify which experimental day one want to analyze. For example ```julia code/functionalConnectivityRaw.jl data/full/ jun1315 jun1415``` would analyze two days of experiment, assuming the data is present in the ```data/full/``` folder. 
+- ```StatsAndExports.jl``` computes the statistics and summaries from the ```results/rawData.jld``` file and returns them as a series of ```jld``` (for figure making) and ```js``` (for the website) files. Notebook coming soon. 
+- ```makeFigures.jl``` does what you would expect. Notebook coming soon.
 
-To summarize, the workflow is schematized as : 
+The workflow is schematized as : 
  ![analysis workflow](./AnalysisWorkflow.svg)
 
-## 
