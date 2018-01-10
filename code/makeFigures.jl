@@ -229,7 +229,7 @@ end
 
 matDistance = makeMatrixPlot("distanceN")
 
-PlotlyJS.savefig(matDistance.o,"plots/matDistance.svg")
+savefig(matDistance,"plots/matDistance.svg")
 
     linesToType = readtable("LinesAndTypes.csv")
 

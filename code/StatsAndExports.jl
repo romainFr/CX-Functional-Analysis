@@ -10,6 +10,11 @@ labbook_table = JLD.load("data/labbookTable.jld")["df"];
 linesToType = readtable("LinesAndTypes.csv");
 full_data_dict = JLD.load("data/rawData.jld");
 
+## Output folder for the website
+try
+    mkdir("js")
+end
+
 ## An per run average version of the fluorescence data (to make figures)
 avg_data_dict = map(full_data_dict) do full  
     (k,full) = full
