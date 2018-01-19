@@ -397,6 +397,10 @@ function writeJS(name,variable_name,someDict)
     end
 end
 
+try
+    mkdir("js")
+end
+
 ## Functions to export fluorescence data (we need dicts for js, and we're selecting the first 6 runs (no drug) for now)
 function get_dataDict_per_key(pk,data_dict)
     dat = data_dict[pk][1:min(6,end)]

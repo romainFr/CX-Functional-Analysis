@@ -240,7 +240,7 @@ stats_per_run[:shortPairName] = shortPre .* " to " .* shortPost
     
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:shortPairName,:baseline_median,
     size=(1500,400),ylims=(0,10),group=:expType,ylabel="Single run baseline",
-    color=["cornflowerblue" "coral" "green"],whisker_width=0.5,xticks=length(:preDrug),
+    color=["cornflowerblue" "coral" "green"],whisker_width=0.5,xticks=[],
     linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,xrotation=45,xtickfont = ("DejaVu Sans",6))
 
 baselineDistsSummary = @df stats_per_run[stats_per_run[:preDrug],:] violin(:expType,:baseline_median,
@@ -287,7 +287,7 @@ l=@layout [a
            b c
            d e f g]
 baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figure2B...,layout=l,size=(1500,1300),
-    margin=Measures.Length(:mm,10.0),title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=[:right :none :right :none :none :none])
+    margin=Measures.Length(:mm,10.0),title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=[:right :none :none :none :none :none])
 
 savefig(baselineSIFig,"plots/baselineSIFig.svg")
 
