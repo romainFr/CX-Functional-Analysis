@@ -1,6 +1,6 @@
 using JLD2,DataFrames,AxisArrays,FileIO,CSV
 using Interpolations
-using StatsBase,Distributions #GLM,
+using StatsBase,Distributions
 using JSON
 using DataStructures
 using Distances,Bootstrap
