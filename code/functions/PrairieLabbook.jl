@@ -46,7 +46,6 @@ function makeflyDict(tableLine;dataFolder="/groups/jayaraman/jayaramanlab/DATA/R
     runTNames = filter(x -> (contains(x,"TSeries") & any([ismatch(Regex("$y\$"),x) for y=runStrings])),readdir(dataPathName))
 
     ## Full path names
-    #runBaseNames = filter(x -> (contains(readdir("$dataPathName/$x"),".xml") & !contains(readdir("$dataPathName/$x"),"Voltage")),runTNames)
     runNames = pmap(runTNames) do runN
         fileNs = readdir("$dataPathName/$runN")
         fileN = filter(x -> (contains(x,".xml") & !contains(x,"Voltage")), fileNs)[1]
