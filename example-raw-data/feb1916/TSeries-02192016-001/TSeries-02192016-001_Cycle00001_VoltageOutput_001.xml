@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Experiment>
+  <Name>Current</Name>
+  <UpdateRate>10000</UpdateRate>
+  <UpdateDivisor>2000</UpdateDivisor>
+  <Waveform>
+    <Name>473</Name>
+    <Enabled>false</Enabled>
+    <AOLine>0</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-256</PlotColor>
+  </Waveform>
+  <Waveform>
+    <Name>amber LED</Name>
+    <Enabled>true</Enabled>
+    <AOLine>1</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-7876870</PlotColor>
+    <WaveformComponent_PulseTrain>
+      <Name>1V30Hz30Pulses</Name>
+      <PulseCount>30</PulseCount>
+      <PulseWidth>2</PulseWidth>
+      <PulseSpacing>31</PulseSpacing>
+      <PulsePotentialStart>1</PulsePotentialStart>
+      <PulsePotentialDelta>0</PulsePotentialDelta>
+      <RestPotential>0</RestPotential>
+      <FirstPulseDelay>3000</FirstPulseDelay>
+      <Repetitions>1</Repetitions>
+      <DelayBetweenReps>0</DelayBetweenReps>
+    </WaveformComponent_PulseTrain>
+  </Waveform>
+  <Waveform>
+    <Name>Blue LED</Name>
+    <Enabled>false</Enabled>
+    <AOLine>2</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-38476</PlotColor>
+    <WaveformComponent_PulseTrain>
+      <Name>LED Jaws1</Name>
+      <PulseCount>1</PulseCount>
+      <PulseWidth>1000</PulseWidth>
+      <PulseSpacing>18</PulseSpacing>
+      <PulsePotentialStart>3</PulsePotentialStart>
+      <PulsePotentialDelta>0</PulsePotentialDelta>
+      <RestPotential>0</RestPotential>
+      <FirstPulseDelay>4500</FirstPulseDelay>
+      <Repetitions>1</Repetitions>
+      <DelayBetweenReps>0</DelayBetweenReps>
+    </WaveformComponent_PulseTrain>
+  </Waveform>
+  <Waveform>
+    <Name>Voltage Output 3</Name>
+    <Enabled>false</Enabled>
+    <AOLine>3</AOLine>
+    <Units>pA</Units>
+    <UnitScaleFactor>2</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-8586240</PlotColor>
+    <WaveformComponent_PulseTrain>
+      <Name>0.5pA steps 2s</Name>
+      <PulseCount>1</PulseCount>
+      <PulseWidth>1000</PulseWidth>
+      <PulseSpacing>2000</PulseSpacing>
+      <PulsePotentialStart>0</PulsePotentialStart>
+      <PulsePotentialDelta>0</PulsePotentialDelta>
+      <RestPotential>0</RestPotential>
+      <FirstPulseDelay>0</FirstPulseDelay>
+      <Repetitions>1</Repetitions>
+      <DelayBetweenReps>0</DelayBetweenReps>
+    </WaveformComponent_PulseTrain>
+  </Waveform>
+  <Waveform>
+    <Name>Voltage Output 4</Name>
+    <Enabled>false</Enabled>
+    <AOLine>4</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-16776961</PlotColor>
+    <WaveformComponent_PatchAmplifier>
+      <Name>Waveform Component #1</Name>
+      <PulseCount>1</PulseCount>
+      <PulseWidth>100</PulseWidth>
+      <PulseSpacing>10</PulseSpacing>
+      <PulsePotentialStart>0.025</PulsePotentialStart>
+      <PulsePotentialDelta>0</PulsePotentialDelta>
+      <RestPotential>0</RestPotential>
+      <FirstPulseDelay>0</FirstPulseDelay>
+      <Repetitions>1</Repetitions>
+      <DelayBetweenReps>0</DelayBetweenReps>
+      <PulseAmplitudeMultiplier>1</PulseAmplitudeMultiplier>
+    </WaveformComponent_PatchAmplifier>
+  </Waveform>
+  <Waveform>
+    <Name>Uncaging X Galvo</Name>
+    <Enabled>false</Enabled>
+    <AOLine>5</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-65536</PlotColor>
+  </Waveform>
+  <Waveform>
+    <Name>Voltage Output 6</Name>
+    <Enabled>false</Enabled>
+    <AOLine>6</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-23296</PlotColor>
+  </Waveform>
+  <Waveform>
+    <Name>Uncaging Y Galvo</Name>
+    <Enabled>false</Enabled>
+    <AOLine>7</AOLine>
+    <Units>V</Units>
+    <UnitScaleFactor>1</UnitScaleFactor>
+    <UnitVoltageOffset>0</UnitVoltageOffset>
+    <UnitScaleOffset>0</UnitScaleOffset>
+    <PlotColor>-7077677</PlotColor>
+  </Waveform>
+</Experiment>
