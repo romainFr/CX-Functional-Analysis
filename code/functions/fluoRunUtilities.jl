@@ -224,17 +224,17 @@ function category_stats(df)
               integNorm = median(df[df[:baseline_median].>0.2,:integNorm_median]),#Ignoring very low baseline runs #median(df[:integral_to_peak_median]./df[:baseline_median]),#predi["integral"][1],#a + b,#itp[0.3],
     integNormMAD = mad(df[:integNorm_median]),#mad(df[:integral_to_peak_median]./df[:baseline_median]),
     baseline = median(df[:baseline_median]),
-        repeats_corr = median(df[:repeats_correlation_median]),
-        peakTime = median(df[:peakTimes_median]),
+    repeats_corr = median(df[:repeats_correlation_median]),
+    peakTime = median(df[:peakTimes_median]),
     state_dependence = cor(df[:distance],df[:baseline_median]),
-     state_dependence_peak = cor(df[:peakFluo_median],df[:baseline_median]),
-        state_dependence_integral = cor(df[:integral_to_peak_median],df[:baseline_median]),
-        between_runs_corr = (sum(cc)-size(cc,1))/(length(cc) - size(cc,1)),
-        run_distance = median(df[:distance]),
-        preNeuron = df[:preNeuron][1],
-        postNeuron = df[:postNeuron][1],
-        expType = df[:expType][1],
-        decay_time = median(df[:half_decay_median]),
-        n = size(df,1)
-        ) 
+    state_dependence_peak = cor(df[:peakFluo_median],df[:baseline_median]),
+    state_dependence_integral = cor(df[:integral_to_peak_median],df[:baseline_median]),
+    between_runs_corr = (sum(cc)-size(cc,1))/(length(cc) - size(cc,1)),
+    run_distance = median(df[:distance]),
+    preNeuron = df[:preNeuron][1],
+    postNeuron = df[:postNeuron][1],
+    expType = df[:expType][1],
+    decay_time = median(df[:half_decay_median]),
+    n = size(df,1)
+    ) 
 end
