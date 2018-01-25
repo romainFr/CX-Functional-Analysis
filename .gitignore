@@ -3,3 +3,4 @@ plots/*
 js/*
 .juliahistory
 code/.juliahistory
+notebooks/.ipynb_checkpoints/*

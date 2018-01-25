@@ -34,10 +34,10 @@ end
 
 
 ### Creates a dictionnary containing all the info for a given fly from the corresponding line in the labbook data frame (needs the path to the data because it uses the Prairie xml files)
-function makeflyDict(tableLine;dataFolder="/groups/jayaraman/jayaramanlab/DATA/Romain/LALConnectivityProject/")
+function makeflyDict(tableLine;dataFolder="/groups/jayaraman/jayaramanlab/DATA/Romain/LALConnectivityProject")
 
     ### Build the xml file names for the runs covered by this fly.
-    dataPathName = "$dataFolder$(tableLine[:folderName][1])"
+    dataPathName = "$dataFolder/$(tableLine[:folderName][1])"
     #runs = [eval(parse(tableLine[:Runs][1]))...]
 
     runStrings = [@sprintf("%03d",r) for r = tableLine[:RegionRuns][1]]
@@ -53,8 +53,7 @@ function makeflyDict(tableLine;dataFolder="/groups/jayaraman/jayaramanlab/DATA/R
         "$dataPathName/$runN/$fileN"
     end
 
-
-    pmap(importPrairie,runNames)
+    map(importPrairie,runNames)
 end
 
 ### Computes the index of the fly in a given experimental day

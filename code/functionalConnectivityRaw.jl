@@ -56,7 +56,6 @@ for i in (1:size(subTab)[1])
     fly = makeflyDict(subTab[i,:],dataFolder=baseDataFolder);
 
     pockelsParams = [fly[i]["globalConfig"]["laserPower_0"] for i in eachindex(fly)]
-    runs = subTab[i,:RegionRuns]
 
     if (!ismissing(subTab[i,:][:Drug][1]))
         drugStart = DateTime(subTab[i,:][:DrugTime][1][1:8],"H:M:S")
