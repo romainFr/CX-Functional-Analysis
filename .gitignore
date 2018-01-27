@@ -4,3 +4,4 @@ js/*
 .juliahistory
 code/.juliahistory
 notebooks/.ipynb_checkpoints/*
+example-raw-data/*

@@ -5,16 +5,11 @@ using JSON
 using DataStructures
 using Distances,Bootstrap
 
-include("code/functions/fluoRunUtilities.jl")
+include("functions/fluoRunUtilities.jl")
 ## Load the labbook, the lines description table and the fluorescence data
 @load "data/labbookTable.jld2" labbook
 linesToType = CSV.read("LinesAndTypes.csv")
 full_data_dict = load("data/rawData.jld2");
-
-## Output folder for the website
-try
-    mkdir("js")
-end
 
 ## An per run average version of the fluorescence data (to make figures)
 avg_data_dict = map(full_data_dict) do full  
@@ -126,14 +121,14 @@ end
     stats_per_run[:integral_to_peak_scaled] =  scaleResponse(stats_per_run[:integral_to_peak_median])
     ## Distance evaluation, statistical significance
     ## We're going to use those stats for distance 
-    stats_to_use = [:integral_to_peak_scaled,
-                :repeats_correlation_median]
+#    stats_to_use = [:integral_to_peak_scaled,
+#                :repeats_correlation_median]
 
 
-addDistances!(stats_per_run,stats_to_use,:integral_to_peak_median)
+#addDistances!(stats_per_run,stats_to_use,:integral_to_peak_median)
 
 ## Distance normalized to the maximum value
-stats_per_run[:distanceNorm] = stats_per_run[:distance]./maximum(abs(stats_per_run[:distance]));
+#stats_per_run[:distanceNorm] = stats_per_run[:distance]./maximum(abs(stats_per_run[:distance]));
 
 ## Drug experiments
 # Selecting mecamylamine runs    
@@ -145,26 +140,25 @@ picrodf = stats_per_run[(stats_per_run[:Drug].=="Picrotoxin") .& (stats_per_run[
 ## Calculate the stats for each pair
 stats_per_pair = by(stats_per_run[stats_per_run[:preDrug],:],[:cellPair,:nPulses_median],category_stats)
 
-function getDrugStats(df)
-    DataFrame(
-              drugEffect = (median(df[(15.>df[:timeToDrug].>11),:integral_to_peak_median])-median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))/abs(median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))
-              )
-end
+#function getDrugStats(df)
+#    DataFrame(
+#              drugEffect = #(median(df[(15.>df[:timeToDrug].>11),:integral_to_peak_median])-median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))/abs(median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))
+#              )
+#end
 
-drugStatsDF = by(stats_per_run[(stats_per_run[:timeToDrug].>-5),:],[:experiment,:cellPair,:Drug],getDrugStats)
+#drugStatsDF = by(stats_per_run[(stats_per_run[:timeToDrug].>-5),:],[:experiment,:cellPair,:Drug],getDrugStats)
 
-drugStatsDFPerPair = aggregate(drugStatsDF[:,[:cellPair,:Drug,:drugEffect]],[:Drug,:cellPair],[median,mad])
+#drugStatsDFPerPair = aggregate(drugStatsDF[:,[:cellPair,:Drug,:drugEffect]],[:Drug,:cellPair],[median,mad])
 ## For each pair compute fit a linear model to the dose response curve
-function getPairDoseResponse(df)
-    #peakNormLM = lm(@formula(peakNorm ~ nPulses_median),df)
-    DataFrame(
-     dose_peak_norm = cor(df[:nPulses_median],df[:peakNorm]),
-     dose_slope_peak_norm = median(df[:peakNorm]./df[:nPulses_median])#coef(peakNormLM)[2]
-    )
-end
+#function getPairDoseResponse(df)
+#    DataFrame(
+#     dose_peak_norm = cor(df[:nPulses_median],df[:peakNorm]),
+#     dose_slope_peak_norm = median(df[:peakNorm]./df[:nPulses_median])#coef(peakNormLM)[2]
+#    )
+#end
 
 ## No 30 pulses for that fit as it seems to saturate
-doseRespDF = by(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:],[:cellPair],getPairDoseResponse);
+#doseRespDF = by(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:],[:cellPair],getPairDoseResponse);
 
 ## Scaled responses
 stats_per_pair[:integNormScaled] = scaleResponse(stats_per_pair[:integNorm])
@@ -180,25 +174,20 @@ addDistances!(stats_per_pair,stats_to_use2,:integNormScaled)
 stats_per_pair[:globalSignif] =  sign.(stats_per_pair[:distance]).*stats_per_pair[:signif1]
 stats_per_pair[stats_per_pair[:globalSignif].==-0.0,:globalSignif]=0
 stats_per_pair[:distanceNorm] = stats_per_pair[:distance]./maximum(abs(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:distance]));
-#stats_per_pair_20[:globalSignif] =  sign.(stats_per_pair_20[:distance]).*stats_per_pair_20[:signif1]
-#stats_per_pair_20[stats_per_pair_20[:globalSignif].==-0.0,:globalSignif]=0
 
 ## Using the 20 pulses significance results for everything here
 stats_per_pair_20 = stats_per_pair[stats_per_pair[:nPulses_median].==20,:]
-stats_per_pair[:signif20] = stats_per_pair_20[indexin(stats_per_pair[:cellPair],
-                                                      stats_per_pair_20[:cellPair]),:globalSignif]
-stats_per_pair[stats_per_pair[:globalSignif].==-0.0,:globalSignif]=0
-stats_per_pair_20 = join(stats_per_pair_20,doseRespDF,on=:cellPair,kind=:left)
+#stats_per_pair[:signif20] = stats_per_pair_20[indexin(stats_per_pair[:cellPair],
+ #                                                     stats_per_pair_20[:cellPair]),:globalSignif]
 
-#stats_per_run[:globalSignif] = stats_per_pair_20[indexin(stats_per_run[:cellPair],
-#        stats_per_pair_20[:cellPair]),:signif1] .* sign(stats_per_pair_20[indexin(stats_per_run[:cellPair],
-#        stats_per_pair_20[:cellPair]),:integNorm]);
-#stats_per_run[stats_per_run[:globalSignif].==-0.0,:globalSignif]=0
+#stats_per_pair_20 = join(stats_per_pair_20,doseRespDF,on=:cellPair,kind=:left)
 
 ## Export the stats (to be used by the plotting scripts)
 @save "data/statTables.jld2" stats_per_run stats_per_pair uniqueTypesUsed stats_per_pair_20
 
-save("data/drugTables.jld2","mecadf",mecadf,"picrodf",picrodf,"drugStats",drugStatsDFPerPair)
+@save "data/drugTables.jld2" mecadf picrodf
+    #save("data/drugTables.jld2","mecadf",mecadf,"picrodf",picrodf,"drugStats",drugStatsDFPerPair)
+    
 ## Functions for export to javascript
 function writeJS(name,variable_name,someDict)
     out_data = JSON.json(someDict)
@@ -207,9 +196,7 @@ function writeJS(name,variable_name,someDict)
     end
 end
 
-try
-    mkdir("js")
-end
+mkpath("js")
 
 ## Functions to export fluorescence data (we need dicts for js, and we're selecting the first 6 runs (no drug) for now)
 function get_dataDict_per_key(pk,data_dict)
@@ -278,11 +265,12 @@ stats_per_pair_20[(stats_per_pair_20[:cellPair].==cp),n][1] for
             n in [:n,:expType,:signif1,:signif5,:distanceNorm]) for
             cp in unique(stats_per_pair_20[:cellPair]))
 
-drugSummary = 
-Dict(cp => Dict(string(n) => 
-drugStatsDFPerPair[(drugStatsDFPerPair[:cellPair].==cp),n][1] for 
-                n in names(drugStatsDFPerPair)) for
-            cp in unique(drugStatsDFPerPair[:cellPair]))
+#drugSummary = 
+#Dict(cp => Dict(string(n) => 
+#drugStatsDFPerPair[(drugStatsDFPerPair[:cellPair].==cp),n][1] for 
+#                n in names(drugStatsDFPerPair)) for
+#            cp in unique(drugStatsDFPerPair[:cellPair]))
+
 ## For now we're exporting the stats for the drug free runs
 perRunDataDict = 
 Dict(cp => Dict(nP => Dict(string(n) => 
@@ -302,4 +290,4 @@ writeJS("js/perRunData.js","PER_RUN_DATA",perRunDataDict)
 writeJS("js/neurontypes.js","NEURON_TYPES",neuronTypes)
 writeJS("js/summaryData.js","SUMMARY_DATA",summaryDataDict)
 writeJS("js/superSummary.js","SUPER_SUMMARY",superSummary)
-writeJS("js/drugSummary.js","DRUG_SUMMARY",drugSummary)
+#writeJS("js/drugSummary.js","DRUG_SUMMARY",drugSummary)
