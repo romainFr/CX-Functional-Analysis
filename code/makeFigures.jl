@@ -105,7 +105,7 @@ fullNamesDF = DataFrame(integNorm = "Normalized integral",
 
 statHists = [makeStatHist(stats_per_pair_20,names(fullNamesDF)[1]),[makeStatHist(stats_per_pair_20,s,label="") for s in names(fullNamesDF)[2:10]]...]
 
-statsHistsGridBig = plot(statHists...,layout=(5,2),size=(800,1200),legend=(0.8,1),margin=5mm)
+statsHistsGridBig = plot(statHists...,layout=(5,2),size=(700,800),legend=(0.75,1),margin=5mm)
 
 savefig(statsHistsGridBig,"plots/statistics_histograms_SI.svg")
 PlotlyJS.savefig(statsHistsGridBig.o,"plots/statistics_histograms_SI.html",js=:remote)
@@ -130,20 +130,20 @@ PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)
 #shortPre = [linesToType[linesToType[:Type_Description].==n,:New_Type_Name][1] for n in stats_per_run[:preNeuron]]
 #shortPost = [linesToType[linesToType[:Type_Description].==n,:New_Type_Name][1] for n in stats_per_run[:postNeuron]]
 #stats_per_run[:shortPairName] = shortPre .* " to " .* shortPost
-    
+
     
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:baseline_median,
-    size=(1500,400),ylims=(0,10),group=:expType,ylabel="Single run baseline",
+    size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline",
     color=["cornflowerblue" "coral" "green"],whisker_width=0.5,xticks=[],
                                                                      linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,xrotation=45,xtickfont = ("DejaVu Sans",6),
                                                                      hover=:cellPair,legend=(0.4,0.9))
 
 baselineDistsSummary = @df stats_per_run[stats_per_run[:preDrug],:] violin(:expType,:baseline_median,
-    size=(600,400),ylabel="Single run baseline",ylims=(0,10),legend=:none,color="gray80",label="")
+    size=(350,300),ylabel="Single run baseline",ylims=(0,10),legend=:none,color="gray80",label="")
 
 stateDependenceSummary = @df stats_per_pair_20 boxplot(:globalSignif,
     :state_dependence_integral,
-    size=(600,400),
+    size=(350,300),
     ylabel="Baseline to integral correlation",
     #group= :expType,
     #label=["Non overlapping" "Overlapping" "Self stimulation"],
@@ -171,9 +171,9 @@ push!(figure2B,
       @df select_data(direct_pair,20,avg_data_dict,1:6,
             labbook,stats_per_run)["stats"] scatter(:baseline_median,
         :integral_to_peak_median ,xlab="",ylab="",mcolor = colorsF["iv"]
-        ,xlims=(0,1.7),label=""))
+                                                    ,xlims=(0,1.7),label=""))
 
-plot(figure2B...,layout=(1,4),size=(1500,400),legend=false,msw=0,
+plot(figure2B...,layout=(1,4),legend=false,msw=0,
     ylab=["Integral to peak" "" "" ""],
     xlab="Baseline value",
     title=["i" "ii" "iii" "iv"],titleloc=:left)
@@ -181,8 +181,8 @@ plot(figure2B...,layout=(1,4),size=(1500,400),legend=false,msw=0,
 l=@layout [a
            b c
            d e f g]
-baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figure2B...,layout=l,size=(1500,1300),
-    margin=Measures.Length(:mm,10.0),title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=(0.4,0.95))
+baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figure2B...,layout=l,size=(800,900),
+    top_margin=10mm,title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=(0.4,0.95))
 
 savefig(baselineSIFig,"plots/baselineSIFig.svg")
 PlotlyJS.savefig(baselineSIFig.o,"plots/baselineSIFig.html",js=:remote)
