@@ -3,7 +3,7 @@ using Interpolations
 using StatsBase,Distributions
 using JSON
 using DataStructures
-using Distances,Bootstrap
+using Distances,Bootstrap,StatsBase
 
 include("functions/fluoRunUtilities.jl")
 ## Load the labbook, the lines description table and the fluorescence data
@@ -104,23 +104,13 @@ stats_per_run[stats_per_run[:overlapping],:expType] = "Overlapping"
 stats_per_run[stats_per_run[:self],:expType] = "Self stimulation"
 stats_per_run[:overlapping] =  stats_per_run[:expType].=="Overlapping"; ## Excluding self activation
 
-## To compute some metrics, we want to symetrize some response 
-## stats around zero (rescale to 
-## account for the fact that inhibitory responses are bounded) 
-scaleResponse = function(resp)
-    getNorm = function(x)
-        ret = (x>=0 ? (x/(maximum(resp))):(-x/(minimum(resp))))
-        ret
-    end
-    [getNorm(x) for x in resp]
-end
 
 
 
-    stats_per_run[:integNorm_scaled] =  scaleResponse(stats_per_run[:integNorm_median])
-    stats_per_run[:integral_to_peak_scaled] =  scaleResponse(stats_per_run[:integral_to_peak_median])
-    ## Distance evaluation, statistical significance
-    ## We're going to use those stats for distance 
+stats_per_run[:integNorm_scaled] =  scaleResponse(stats_per_run[:integNorm_median],trimming=true)
+stats_per_run[:integral_to_peak_scaled] =  scaleResponse(stats_per_run[:integral_to_peak_median],trimming=true)
+## Distance evaluation, statistical significance
+## We're going to use those stats for distance 
 #    stats_to_use = [:integral_to_peak_scaled,
 #                :repeats_correlation_median]
 
@@ -166,19 +156,21 @@ stats_per_pair[:integNormScaled] = scaleResponse(stats_per_pair[:integNorm])
 
 
 stats_to_use2 = [:integNormScaled,
-                 :repeats_corr
+                 :between_runs_corr
+                 #:repeats_corr
                ];
 
 addDistances!(stats_per_pair,stats_to_use2,:integNormScaled)
 ## Add a signed significance to be used in summary diagrams/matrices
 stats_per_pair[:globalSignif] =  sign.(stats_per_pair[:distance]).*stats_per_pair[:signif1]
 stats_per_pair[stats_per_pair[:globalSignif].==-0.0,:globalSignif]=0
-stats_per_pair[:distanceNorm] = stats_per_pair[:distance]./maximum(abs(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:distance]));
+stats_per_pair[:distanceNorm] = stats_per_pair[:distance]./maximum(trim(abs.(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:distance]),
+                                                                        prop=0.01));
 
 ## Using the 20 pulses significance results for everything here
 stats_per_pair_20 = stats_per_pair[stats_per_pair[:nPulses_median].==20,:]
-#stats_per_pair[:signif20] = stats_per_pair_20[indexin(stats_per_pair[:cellPair],
- #                                                     stats_per_pair_20[:cellPair]),:globalSignif]
+stats_per_pair[:signif20] = stats_per_pair_20[indexin(stats_per_pair[:cellPair],
+                                                      stats_per_pair_20[:cellPair]),:globalSignif]
 
 #stats_per_pair_20 = join(stats_per_pair_20,doseRespDF,on=:cellPair,kind=:left)
 

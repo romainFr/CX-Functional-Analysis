@@ -74,7 +74,7 @@ function getStatistics(runArray)
 
         ## Measurements normalized by baseline
         peakFluoNorm = peakFluo./vec(baseline)
-        integralToPeakNorm = (integralToPeak - nPulses[tt]*0.0005)./vec(baseline) ## Small ad-hoc correction to avoid influence of the stim artefact
+        integralToPeakNorm = (integralToPeak .- peakTimes*0.005)./abs.(vec(baseline)) ## Small ad-hoc correction to avoid influence of the stim artefact. Ideally we should scale that with the global baseline absolute value
         
         miniDf = DataFrame(Array{Number,1}[vec(baseline),
                                integrals,
@@ -136,6 +136,21 @@ function compileStats(runArrayDict,keys)
     end
    
     statsDf
+end
+
+## To compute some metrics, we want to symetrize some response 
+## stats around zero (rescale to 
+## account for the fact that inhibitory responses are bounded).
+## As it's per run and some of those statistics are affected by low baselines, we do
+## trim 1% (0.5% on each side) of the data to establish the extrema (anything out will be considered outliers)
+function scaleResponse(resp;trimming=false)
+    maxM = trimming ? maximum(trim(resp,prop=0.005)) : maximum(resp)
+    minM = trimming ? minimum(trim(resp,prop=0.005)) : minimum(resp)
+    getNorm = function(x)
+        ret = (x>=0 ? (x/(maxM)):(-x/(minM)))
+        ret
+    end
+    [getNorm(x) for x in resp]
 end
 
 ## A function that removes outliers to get a better estimate of the covariance matrix for
