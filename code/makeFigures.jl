@@ -18,13 +18,16 @@ avg_data_dict = load("data/avgData.jld2")
 
 @load "data/statTables.jld2"
 
+@load "data/drugTables.jld2"
+interpData = load("data/interpolatedData.jld2")
+
 cellPairs = sort(unique(labbook[ismissing.(labbook[:TAGS]),:cellToCell]))
 genotypes = sort(unique(labbook[ismissing.(labbook[:TAGS]),:genotypeRegion]));
 
-## Figure 2 of the paper
+## Figure "Responses" of the paper
 ## Selected example pairs
 
-pairs_for_figure2 = Dict([("vi","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.s-EBt.b-DV_GA.b"),
+pairs_for_figureResp = Dict([("vi","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.s-EBt.b-DV_GA.b"),
                           ("v","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl1.b-NO3PM.b"),
                           ("iv","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-FBl3.b-NO2D.b"),
                           ("iii","LAL.s-GAi.s-NO1i.b-to-EBIRP I-O-LAL.s"),
@@ -33,21 +36,21 @@ pairs_for_figure2 = Dict([("vi","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.s-EB
                          ])
 
 
-excPlot = make_raw_plot(select_data(pairs_for_figure2["i"],20,interpData,1:6,labbook),substract=true,framestyle=:axes,axis=:y,link=:x)
+excPlot = make_raw_plot(select_data(pairs_for_figureResp["i"],20,interpData,1:6,labbook),substract=true,framestyle=:axes,axis=:y,link=:x)
 
-inhPlot = make_raw_plot(select_data(pairs_for_figure2["ii"],20,interpData,1:6,labbook),scalebar=false,
+inhPlot = make_raw_plot(select_data(pairs_for_figureResp["ii"],20,interpData,1:6,labbook),scalebar=false,
     framestyle=:axes,axis=:y,link=:x)
 
-weakPlot = make_raw_plot(select_data(pairs_for_figure2["iii"],20,interpData,1:6,labbook),scaley=1.5,
+weakPlot = make_raw_plot(select_data(pairs_for_figureResp["iii"],20,interpData,1:6,labbook),scaley=1.5,
     substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x)
 
-confPlot = make_raw_plot(select_data(pairs_for_figure2["iv"],20,interpData,1:6,labbook),
+confPlot = make_raw_plot(select_data(pairs_for_figureResp["iv"],20,interpData,1:6,labbook),
     substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x)
 
-reboundPlot = make_raw_plot(select_data(pairs_for_figure2["v"],20,interpData,1:6,labbook),substract=true,
+reboundPlot = make_raw_plot(select_data(pairs_for_figureResp["v"],20,interpData,1:6,labbook),substract=true,
    scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[0;1.5;3])
 
-nothingPlot = make_raw_plot(select_data(pairs_for_figure2["vi"],20,interpData,1:6,labbook),substract=true,
+nothingPlot = make_raw_plot(select_data(pairs_for_figureResp["vi"],20,interpData,1:6,labbook),substract=true,
     scalebar=false,framestyle=:axes,axis=:y,link=:x)
    
 direct_pair = "PBG1-7.s-FBl2.s-LAL.b-cre.b-to-PBG1-7.s-FBl2.s-LAL.b-cre.b"
@@ -99,11 +102,7 @@ fullNamesDF = DataFrame(integNorm = "Normalized integral",
                         between_runs_corr = "Correlations between experiments",
                         state_dependence_integral = "Integral to baseline correlation",
                         state_dependence = "Distance to baseline correlation",
-                        #dose_slope_peak_norm= "Stimulation to normalized peak slope", 
-                        #dose_slope_peak_normScaled= "Stimulation to normalized scaled peak slope", 
-                        #dose_peak_norm = "Norm peak to stimulation correlation",  
                         distance = "Distance",
-                        #baselineMAD = "Estimated baseline spread",
                         responding = "Responding");
  
 
@@ -130,13 +129,7 @@ makeMatrixPlot("distanceN",size=(1100,1100),title="B",title_location=:left,top_m
 savefig(matDistance,"plots/matDistance.svg")
 PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)
 
-#linesToType = CSV.read("LinesAndTypes.csv")
-
-#shortPre = [linesToType[linesToType[:Type_Description].==n,:New_Type_Name][1] for n in stats_per_run[:preNeuron]]
-#shortPost = [linesToType[linesToType[:Type_Description].==n,:New_Type_Name][1] for n in stats_per_run[:postNeuron]]
-#stats_per_run[:shortPairName] = shortPre .* " to " .* shortPost
-
-   
+## Baseline effects
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:baseline_median,
     size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline",
                                                                      #color=["cornflowerblue" "coral" "green"]
@@ -168,19 +161,19 @@ ylimsF = Dict("i"=>(0,5),"ii"=>(-1,0.2),"iii"=>(0,0.2),"iv"=>(0,6))
 #baselineCorr = [stats_per_pair_20[(stats_per_pair_20[:cellPair].==x) .& (
 #                           stats_per_pair_20[:nPulses_median].==20),:state_dependence_peak] 
 #           for x in [[pairs_for_figure2[i] for i in ["i","ii","iii"]]...,direct_pair]]
-figure2B = [@df select_data(pairs_for_figure2[x],20,avg_data_dict,1:6,labbook,
+figureExampleState = [@df select_data(pairs_for_figureResp[x],20,avg_data_dict,1:6,labbook,
             stats_per_run
             )["stats"] scatter(:baseline_median,:integral_to_peak_median ,ylab="",
              mcolor = colorsF[x],
             xlab="",xlims=(0,),ylims=ylimsF[x],label="") for x in ["i","ii","iii"]]
 
-push!(figure2B,
+push!(figureExampleState,
       @df select_data(direct_pair,20,avg_data_dict,1:6,
             labbook,stats_per_run)["stats"] scatter(:baseline_median,
         :integral_to_peak_median ,xlab="",ylab="",mcolor = colorsF["iv"]
                                                     ,xlims=(0,1.7),label=""))
 
-plot(figure2B...,layout=(1,4),legend=false,msw=0,
+plot(figureExampleState...,layout=(1,4),legend=false,msw=0,
     ylab=["Integral to peak" "" "" ""],
     xlab="Baseline value",
     title=["i" "ii" "iii" "iv"],titleloc=:left,xrotation=45)
@@ -188,7 +181,7 @@ plot(figure2B...,layout=(1,4),legend=false,msw=0,
 l=@layout [a
            b c
            d e f g]
-baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figure2B...,layout=l,size=(800,900),
+baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,figureExampleState...,layout=l,size=(800,900),
     top_margin=5mm,bottom_margin=7mm,title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=(0.35,0.97))
 
 savefig(baselineSIFig,"plots/baselineSIFig.svg")
@@ -216,8 +209,7 @@ PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.html",js=:remote)
 
 #Blink.AtomShell.install()
 
-@load "data/drugTables.jld2"
-interpData = load("data/interpolatedData.jld2")
+
 
 #drugStats[:globalSignif]=stats_per_pair_20[:globalSignif][[findin(stats_per_pair_20[:cellPair],[s])[1] for s in drugStats[:cellPair]]];
 
