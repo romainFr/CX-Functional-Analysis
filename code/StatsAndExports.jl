@@ -155,12 +155,12 @@ stats_per_pair[:integNormScaled] = scaleResponse(stats_per_pair[:integNorm])
 #stats_per_pair[:dose_slope_peak_normScaled] = scaleResponse(stats_per_pair[:dose_slope_peak_norm])
 
 
-stats_to_use2 = [:integNormScaled,
+stats_to_use = [:integNormScaled,
                  :between_runs_corr
                  #:repeats_corr
                ];
 
-addDistances!(stats_per_pair,stats_to_use2,:integNormScaled)
+addDistances!(stats_per_pair,stats_to_use,:integNormScaled)
 ## Add a signed significance to be used in summary diagrams/matrices
 stats_per_pair[:globalSignif] =  sign.(stats_per_pair[:distance]).*stats_per_pair[:signif1]
 stats_per_pair[stats_per_pair[:globalSignif].==-0.0,:globalSignif]=0
