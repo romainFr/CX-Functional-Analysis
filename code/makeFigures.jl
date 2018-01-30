@@ -132,9 +132,8 @@ PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)
 ## Baseline effects
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:baseline_median,
     size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline",
-                                                                     #color=["cornflowerblue" "coral" "green"]
                                                                      whisker_width=0.5,xticks=[],
-                                                                     linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,xrotation=45,xtickfont = ("DejaVu Sans",6),
+                                                                     linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,
                                                                      hover=:cellPair,legend=(0.35,0.92))
 
 baselineDistsSummary = @df stats_per_run[stats_per_run[:preDrug],:] violin(:expType,:baseline_median,
@@ -144,23 +143,17 @@ stateDependenceSummary = @df stats_per_pair_20 boxplot(:globalSignif,
     :state_dependence_integral,
     size=(350,300),
     ylabel="Baseline to integral correlation",
-    #group= :expType,
-    #label=["Non overlapping" "Overlapping" "Self stimulation"],
     whisker_width=0.5,
     bar_width=0.7,
-    #xrotation=20,
     fillcolor=:gray80,
     linecolor=:gray50,
     xticks=([-1,0,1],["Inhibition","Non significant","Excitation"]),
     xlim=(-1.6,1.5),
     legend=:none,label="")
 
-#colorsF = Dict("i"=>"coral","ii"=>"coral","iii"=>"coral","iv"=>"green")
 colorsF = Dict("i"=>2,"ii"=>2,"iii"=>2,"iv"=>3)
 ylimsF = Dict("i"=>(0,5),"ii"=>(-1,0.2),"iii"=>(0,0.2),"iv"=>(0,6))
-#baselineCorr = [stats_per_pair_20[(stats_per_pair_20[:cellPair].==x) .& (
-#                           stats_per_pair_20[:nPulses_median].==20),:state_dependence_peak] 
-#           for x in [[pairs_for_figure2[i] for i in ["i","ii","iii"]]...,direct_pair]]
+
 figureExampleState = [@df select_data(pairs_for_figureResp[x],20,avg_data_dict,1:6,labbook,
             stats_per_run
             )["stats"] scatter(:baseline_median,:integral_to_peak_median ,ylab="",
