@@ -73,15 +73,17 @@ end
 function makeStatHist(statDf,statN;kwargs...)
         stephist(statDf[statN],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[statN]),maximum(statDf[statN]),30),
-            xlab=fullNamesDF[statN][1],
-            color=["cornflowerblue" "coral" "green"];kwargs...)
+            xlab=fullNamesDF[statN][1]#,
+                 #color=["cornflowerblue" "coral" "green"]
+                 ;kwargs...)
 end
 
 function makeStatHist!(statDf,pl,stat;kwargs...)
     stephist!(pl,statDf[stat],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[stat]),maximum(statDf[stat]),30),
-            xlab="",
-            color=["cornflowerblue" "coral" "green"];kwargs...)
+            xlab=""#,
+              #color=["cornflowerblue" "coral" "green"]
+              ;kwargs...)
 end
 
 ## Matrix plot
@@ -100,18 +102,21 @@ function getMat(I,J,column)
     mat
 end
 
-function makeMatrixPlot(statUsed)
+function makeMatrixPlot(statUsed;kwargs...)
     mat = statsMatrices[statUsed]
     matVals = filter(x->!isnan(x),mat)
     grad = ColorGradient(ColorGradient(:bluesreds).colors,[0,-minimum(matVals)/(maximum(matVals)-minimum(matVals)),1.0])
 
     themat = heatmap(uniqueTypesUsed, uniqueTypesUsed, mat,aspect_ratio=1,
-         color=grad,xrotation=90,size=(1500,1500),yguide="Presynaptic candidate",xguide="Postsynaptic candidate",
-         xticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed),
-         yticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed),
+                     color=grad,
+                     xrotation=90
+                     ,yguide="Presynaptic candidate",xguide="Postsynaptic candidate",
+                     xticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed),
+                     yticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed);
+                     kwargs...
          )
-    plot!(themat,identity,line=(:grey80,:dot),lab="",legend=false)
-    scatter!(themat,collect(findn(matGuesses))-0.5...,m=(:black),msw=0,malpha=0.5,lab="")
+    plot!(themat,identity,line=(:grey80,:dot),lab="")
+    scatter!(themat,collect(findn(matGuesses))-0.5...,m=(:black),msw=0,malpha=0.5,lab="Overlapping pairs")
     themat
 end
 
@@ -145,9 +150,14 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
     drugDataS = squeeze(std(cat(2,drugData...),2)./length(preData),2)
     postDataS = squeeze(std(cat(2,postData...),2)./length(preData),2)
 
-    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,color=:cornflowerblue,xlabel="Time (s)",label="",right_margin=10mm,top_margin=5mm,bottom_margin=15mm)
-    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,color=:coral,label="")
-    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,color=:gray70,label="")
+    # In case there's only one experiment
+    preDataS[isnan.(preDataS)]=0
+    drugDataS[isnan.(drugDataS)]=0
+    postDataS[isnan.(postDataS)]=0
+    
+    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,xlabel="Time (s)",label="",right_margin=10mm,top_margin=5mm,bottom_margin=15mm)
+    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="")
+    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="")
     
     topvalue = maximum([maximum(preDataM.+preDataS),maximum(postDataM.+postDataS),maximum(drugDataM.+drugDataS)])+1
     plot!([0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
