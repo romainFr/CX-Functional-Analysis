@@ -222,9 +222,9 @@ mecaOthers[1].subplots[2].series_list[2][:label] = "Mecamylamine"
 mecaOthers[1].subplots[2].series_list[3][:label] = "Wash"
 
 mecaLayout = @layout [a{0.01h}
-                      grid(5,2){0.635h}
+                      grid(5,2){0.67h}
                       b{0.01h}
-                      grid(2,2){0.265h}
+                      grid(2,2){0.23h}
                       c{.01h}
                       grid(1,2){0.07h}]
 
@@ -234,9 +234,10 @@ mecaPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                  mecaISP...,plot(),
                  plot(title="C",title_location=:left,framestyle=:none),
                  mecaOthers...,
-                 layout=mecaLayout,size=(800,1500),legend=(0.75,0.2))
+                 layout=mecaLayout,size=(800,1700),legend=(0.75,0.2))
 
 savefig(mecaPlots,"plots/mecaPlots.svg")
+savefig(mecaPlots,"plots/mecaPlots.pdf")
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.html",js=:remote)
 
 
@@ -257,10 +258,11 @@ picroPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                   picroInhib...,plot(),
                   plot(title="B",title_location=:left,framestyle=:none),
                   picroControl...,
-                  layout=picroLayout,size=(1000,2100),legend=(0.75,0.6)
+                  layout=picroLayout,size=(800,1500),legend=(0.75,0.6)
                   )
 
 savefig(picroPlots,"plots/picroPlots.svg")
+savefig(picroPlots,"plots/picroPlots.pdf")
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.html",js=:remote)
 
 inhibPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"
@@ -288,4 +290,5 @@ deltaFig = plot(deltaInhib,deltaExcit,deltaMixedP,layout=deltaL,size=(800,800),
     bottom_margin=7mm,top_margin=5mm)
 
 savefig(deltaFig,"plots/delta7SI.svg")
+savefig(deltaFig,"plots/delta7SI.pdf")
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.html",js=:remote)
