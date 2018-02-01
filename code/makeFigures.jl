@@ -46,7 +46,7 @@ weakPlot = make_raw_plot(select_data(pairs_for_figureResp["iii"],20,interpData,1
 
 confPlot = make_raw_plot(select_data(pairs_for_figureResp["iv"],20,interpData,1:6,labbook),
     substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x)
-
+ 
 reboundPlot = make_raw_plot(select_data(pairs_for_figureResp["v"],20,interpData,1:6,labbook),substract=true,
    scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[0;1.5;3])
 
@@ -59,7 +59,7 @@ direct = make_raw_plot(select_data(direct_pair,20,interpData,1:6,labbook),substr
 
 figureResponseA = plot(excPlot,inhPlot,nothingPlot,weakPlot,confPlot,reboundPlot,layout = (2,3),
         title = ["A i" "ii" "iii" "B i" "ii" "iii"],titleloc=:left,top_margin=30mm
-    ,size = (1000,600),bottom_margin=Measures.Length(:mm,15.0),link=:x)
+    ,size = (800,500),bottom_margin=7mm,link=:x)
 ## The top margin is to fit neuron schematics
 savefig(figureResponseA,"plots/figureResponseAPlots.svg")
 PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.html",js=:remote)
@@ -69,12 +69,12 @@ null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].
 
 figureResponseDLayout = @layout [i grid(2,2,widths=[0.9,0.1],heights=[0.1,0.9])]
 figureResponseDLayout[1,2][1,2].attr[:blank]=true
-figureResponseD = plot(layout=figureResponseDLayout,size=(1000,450),xlabel="",ylabel="",legend=false,titlepos=:left)
+figureResponseD = plot(layout=figureResponseDLayout,size=(800,400),xlabel="",ylabel="",legend=false,titlepos=:left)
 
 make_raw_plot!(figureResponseD,select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",subplot=1,title="D i")
-    makeStatHist!(stats_per_pair_20,figureResponseD,:between_runs_corr,subplot=2,grid=false,link=:x,axis=:x,ticks=nothing,top_margin=15mm,label="",title="ii")
+makeStatHist!(stats_per_pair_20,figureResponseD,:between_runs_corr,subplot=2,grid=false,link=:x,axis=:x,ticks=nothing,top_margin=15mm,label="",title="ii")
 
-makeStatHist!(stats_per_pair_20,figureResponseD,:integNormScaled,subplot=4,orientation=:h,grid=false,axis=:y,ticks=nothing,ylim=(-1.05,1.05),xlim = (0,18),legend=(0.65,1))
+makeStatHist!(stats_per_pair_20,figureResponseD,:integNormScaled,subplot=4,orientation=:h,grid=false,axis=:y,ticks=nothing,ylim=(-1.05,1.05),xlim = (0,18),legend=(0.67,1.02))
  
 @df stats_per_pair_20 scatter!(figureResponseD,:between_runs_corr,:integNormScaled,
                                group=(:signif1,:expType),
@@ -108,9 +108,10 @@ fullNamesDF = DataFrame(integNorm = "Normalized integral",
 
 statHists = [makeStatHist(stats_per_pair_20,names(fullNamesDF)[1]),[makeStatHist(stats_per_pair_20,s,label="") for s in names(fullNamesDF)[2:10]]...]
 
-statsHistsGridBig = plot(statHists...,layout=(5,2),size=(700,800),legend=(0.75,1),margin=5mm)
+statsHistsGridBig = plot(statHists...,layout=(5,2),size=(700,700),legend=(0.8,0.97),margin=5mm)
 
 savefig(statsHistsGridBig,"plots/statistics_histograms_SI.svg")
+savefig(statsHistsGridBig,"plots/statistics_histograms_SI.pdf")
 PlotlyJS.savefig(statsHistsGridBig.o,"plots/statistics_histograms_SI.html",js=:remote)
 
 
@@ -124,7 +125,7 @@ matGuesses = transpose(full(sparse(Is, Js, stats_per_pair_20[:expType].=="Overla
         length(uniqueTypesUsed),length(uniqueTypesUsed))))
 
 matDistance = 
-makeMatrixPlot("distanceN",size=(1100,1100),title="B",title_location=:left,top_margin=5mm,tickfontsize=9,legend=(0.1,0.2))
+makeMatrixPlot("distanceN",size=(1000,1000),title="B",title_location=:left,top_margin=5mm,tickfontsize=9,legend=(0.1,0.2))
 
 savefig(matDistance,"plots/matDistance.svg")
 PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)
@@ -178,6 +179,7 @@ baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,f
     top_margin=5mm,bottom_margin=7mm,title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=(0.35,0.97))
 
 savefig(baselineSIFig,"plots/baselineSIFig.svg")
+savefig(baselineSIFig,"plots/baselineSIFig.pdf")
 PlotlyJS.savefig(baselineSIFig.o,"plots/baselineSIFig.html",js=:remote)
 
 doseRespPlot = @> stats_per_pair begin 
@@ -198,6 +200,7 @@ end
 end
 
 savefig(doseRespPlot,"plots/doseRespSI.svg")
+savefig(doseRespPlot,"plots/doseRespSI.pdf")
 PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.html",js=:remote)
 
 #Blink.AtomShell.install()
@@ -219,11 +222,11 @@ mecaOthers[1].subplots[2].series_list[2][:label] = "Mecamylamine"
 mecaOthers[1].subplots[2].series_list[3][:label] = "Wash"
 
 mecaLayout = @layout [a{0.01h}
-                      grid(5,2){0.6h}
+                      grid(5,2){0.635h}
                       b{0.01h}
-                      grid(2,2){0.24h}
+                      grid(2,2){0.265h}
                       c{.01h}
-                      grid(1,2){0.13h}]
+                      grid(1,2){0.07h}]
 
 mecaPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                  mecaColu...,
@@ -231,7 +234,7 @@ mecaPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                  mecaISP...,plot(),
                  plot(title="C",title_location=:left,framestyle=:none),
                  mecaOthers...,
-                 layout=mecaLayout,size=(1000,2400),legend=(0.75,0.2))
+                 layout=mecaLayout,size=(800,1500),legend=(0.75,0.2))
 
 savefig(mecaPlots,"plots/mecaPlots.svg")
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.html",js=:remote)

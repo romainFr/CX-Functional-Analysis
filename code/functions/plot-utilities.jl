@@ -73,7 +73,7 @@ end
 function makeStatHist(statDf,statN;kwargs...)
         stephist(statDf[statN],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[statN]),maximum(statDf[statN]),30),
-            xlab=fullNamesDF[statN][1]#,
+            title=fullNamesDF[statN][1],titlefontsize=10#,
                  #color=["cornflowerblue" "coral" "green"]
                  ;kwargs...)
 end
@@ -173,7 +173,7 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
         @set_attr :title cp
         @set_attr :hover _[2]
         @plot scatter!(legend=:none,
-                       ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",10),title_location=:right)
+                       ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",8),title_location=:right)
     end
     pairPlot
 end
