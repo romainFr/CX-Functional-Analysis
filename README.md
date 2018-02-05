@@ -1,3 +1,5 @@
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/romainFr/CX-Functional-Analysis/master)
+
 # CX-Functional-Analysis
 Code and instructions to reproduce all the analysis used to generate the figures in () and the tables underlying the associated [website](https://romainfr.github.io/CX-Functional-Website/).
 
