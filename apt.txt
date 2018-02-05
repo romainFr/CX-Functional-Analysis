@@ -1,2 +1,3 @@
 unzip
 imagemagick
+npm
