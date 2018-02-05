@@ -1,4 +1,4 @@
 dependencies:
-- pip
-- pip:
-- julia	
+  - pip
+  - pip:
+    - julia
