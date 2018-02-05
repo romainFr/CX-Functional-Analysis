@@ -2,3 +2,4 @@ dependencies:
   - pip
   - pip:
     - julia
+    - http-parser

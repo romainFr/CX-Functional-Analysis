@@ -1,4 +1,2 @@
-libhttp-parser2.1
-libhttp-parser-dev
 unzip
 imagemagick
