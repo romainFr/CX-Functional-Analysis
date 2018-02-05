@@ -7,7 +7,7 @@ using JLD2
 using DataFrames,CSV
 using Images
 using FileIO,ImageMagick
-using subpixelRegistration
+using SubpixelRegistration
 using FluorescentSeries
 using PrairieIO
 using Clustering
