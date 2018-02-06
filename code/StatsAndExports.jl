@@ -190,9 +190,8 @@ filter!((x,y) -> y!=0,out_data_avg)
 writeJS("js/avg_data.js","AVG_DATA",out_data_avg)
 
 ## Exporting a table mapping the experiments to the cell pairs
-pairToExp = Dict(cpair => convert(Array{String},labbook[convert(Array{Bool}
-                ,labbook[:cellToCell].==cpair),:keyEntry]) for 
-        cpair in unique(labbook[:cellToCell]))
+pairToExp = Dict(cpair => convert(Array{String},labbook[convert(Array{Bool},labbook[:cellToCell].==cpair),:keyEntry]) for 
+                 cpair in unique(labbook[:cellToCell]))
 
 writeJS("js/pairsToExp.js","PAIRS_TO_EXP",pairToExp)
 
@@ -227,12 +226,12 @@ stats_per_pair_20[(stats_per_pair_20[:cellPair].==cp),n][1] for
 
 ## For now we're exporting the stats for the drug free runs
 perRunDataDict = 
-Dict(cp => Dict(nP => Dict(string(n) => 
-stats_per_run[(stats_per_run[:cellPair].==cp) .& (stats_per_run[:nPulses_median].==nP) .& (stats_per_run[:preDrug]),
-    n] for 
-                n in names(stats_per_run)[[collect(3:end)...]]) for
-    nP in stats_per_run[stats_per_run[:cellPair].==cp,:nPulses_median]) for 
-    cp in unique(stats_per_run[:cellPair]))
+Dict(exp => Dict(nP => Dict(string(n) => 
+unique(stats_per_run[(stats_per_run[:experiment].==exp) .& (stats_per_run[:nPulses_median].==nP) .& (stats_per_run[:preDrug]),
+    n]) for 
+                n in names(stats_per_run)) for
+    nP in stats_per_run[stats_per_run[:experiment].==exp,:nPulses_median]) for 
+    exp in unique(stats_per_run[:experiment]))
 
 ## A table of drivers, used by the website
 drivers = Dict(td => convert(Array,
