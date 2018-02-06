@@ -104,21 +104,8 @@ stats_per_run[stats_per_run[:overlapping],:expType] = "Overlapping"
 stats_per_run[stats_per_run[:self],:expType] = "Self stimulation"
 stats_per_run[:overlapping] =  stats_per_run[:expType].=="Overlapping"; ## Excluding self activation
 
-
-
-
 stats_per_run[:integNorm_scaled] =  scaleResponse(stats_per_run[:integNorm_median],trimming=true)
 stats_per_run[:integral_to_peak_scaled] =  scaleResponse(stats_per_run[:integral_to_peak_median],trimming=true)
-## Distance evaluation, statistical significance
-## We're going to use those stats for distance 
-#    stats_to_use = [:integral_to_peak_scaled,
-#                :repeats_correlation_median]
-
-
-#addDistances!(stats_per_run,stats_to_use,:integral_to_peak_median)
-
-## Distance normalized to the maximum value
-#stats_per_run[:distanceNorm] = stats_per_run[:distance]./maximum(abs(stats_per_run[:distance]));
 
 ## Drug experiments
 # Selecting mecamylamine runs    
@@ -130,31 +117,8 @@ picrodf = stats_per_run[(stats_per_run[:Drug].=="Picrotoxin") .& (stats_per_run[
 ## Calculate the stats for each pair
 stats_per_pair = by(stats_per_run[stats_per_run[:preDrug],:],[:cellPair,:nPulses_median],category_stats)
 
-#function getDrugStats(df)
-#    DataFrame(
-#              drugEffect = #(median(df[(15.>df[:timeToDrug].>11),:integral_to_peak_median])-median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))/abs(median(df[(0.>df[:timeToDrug].>-5),:integral_to_peak_median]))
-#              )
-#end
-
-#drugStatsDF = by(stats_per_run[(stats_per_run[:timeToDrug].>-5),:],[:experiment,:cellPair,:Drug],getDrugStats)
-
-#drugStatsDFPerPair = aggregate(drugStatsDF[:,[:cellPair,:Drug,:drugEffect]],[:Drug,:cellPair],[median,mad])
-## For each pair compute fit a linear model to the dose response curve
-#function getPairDoseResponse(df)
-#    DataFrame(
-#     dose_peak_norm = cor(df[:nPulses_median],df[:peakNorm]),
-#     dose_slope_peak_norm = median(df[:peakNorm]./df[:nPulses_median])#coef(peakNormLM)[2]
-#    )
-#end
-
-## No 30 pulses for that fit as it seems to saturate
-#doseRespDF = by(stats_per_pair[stats_per_pair[:nPulses_median].<=20,:],[:cellPair],getPairDoseResponse);
-
 ## Scaled responses
 stats_per_pair[:integNormScaled] = scaleResponse(stats_per_pair[:integNorm])
-#stats_per_pair[:dose_slope_peak_normScaled] = scaleResponse(stats_per_pair[:dose_slope_peak_norm])
-
-
 stats_to_use = [:integNormScaled,
                  :between_runs_corr
                  #:repeats_corr
@@ -178,8 +142,13 @@ stats_per_pair[:signif20] = stats_per_pair_20[indexin(stats_per_pair[:cellPair],
 @save "data/statTables.jld2" stats_per_run stats_per_pair uniqueTypesUsed stats_per_pair_20
 
 @save "data/drugTables.jld2" mecadf picrodf
-    #save("data/drugTables.jld2","mecadf",mecadf,"picrodf",picrodf,"drugStats",drugStatsDFPerPair)
-    
+
+## Export all the tables to csv
+CSV.write("data/stats_per_run.csv",stats_per_run)
+CSV.write("data/stats_per_pair.csv",stats_per_pair)
+CSV.write("data/stats_mecamylamine.csv",mecadf)
+CSV.write("data/stats_picrotoxin.csv",picrodf)
+
 ## Functions for export to javascript
 function writeJS(name,variable_name,someDict)
     out_data = JSON.json(someDict)
@@ -250,18 +219,11 @@ stats_per_pair[(stats_per_pair[:cellPair].==cp) .& (stats_per_pair[:nPulses_medi
 
 
 ## PAIRS REQUIRING OUR ATTENTION FOR REPEATS
-#unique(stats_per_pair[stats_per_pair[:n].<=3,:cellPair])
 superSummary = 
 Dict(cp => Dict(string(n) => 
 stats_per_pair_20[(stats_per_pair_20[:cellPair].==cp),n][1] for 
             n in [:n,:expType,:signif1,:signif5,:distanceNorm]) for
             cp in unique(stats_per_pair_20[:cellPair]))
-
-#drugSummary = 
-#Dict(cp => Dict(string(n) => 
-#drugStatsDFPerPair[(drugStatsDFPerPair[:cellPair].==cp),n][1] for 
-#                n in names(drugStatsDFPerPair)) for
-#            cp in unique(drugStatsDFPerPair[:cellPair]))
 
 ## For now we're exporting the stats for the drug free runs
 perRunDataDict = 
@@ -282,4 +244,4 @@ writeJS("js/perRunData.js","PER_RUN_DATA",perRunDataDict)
 writeJS("js/neurontypes.js","NEURON_TYPES",neuronTypes)
 writeJS("js/summaryData.js","SUMMARY_DATA",summaryDataDict)
 writeJS("js/superSummary.js","SUPER_SUMMARY",superSummary)
-#writeJS("js/drugSummary.js","DRUG_SUMMARY",drugSummary)
+
