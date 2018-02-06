@@ -1,0 +1,4 @@
+julia firstInstallPlotly.jl
+rpl FALLTROUGH FALLTHROUGH /srv/julia/pkg/v0.6/HttpParser/deps/src/http-parser-2.7.1/http_parser.c
+sed -i '1817 a /* FALLTHROUGH */' /srv/julia/pkg/v0.6/HttpParser/deps/src/http-parser-2.7.1/http_parser.c
+julia nonRegisteredPkg.jl
