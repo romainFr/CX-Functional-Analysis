@@ -97,16 +97,16 @@ for i in (1:size(subTab)[1])
     ref = convert(SharedArray,runFluos[length(runFluos)]["av"])
 
     runFluos[1:(length(runFluos)-1)] = pmap(runFluos[1:(length(runFluos)-1)],1:(length(runFluos)-1)) do rF,run
-        registration = subpixelRegistration.stackDftReg(rF["av"],ref=ref,ufac=1)
+        registration = SubpixelRegistration.stackDftReg(rF["av"],ref=ref,ufac=1)
         shifts[:,run] = round.(Int64,registration["shift"])
         ## Align the grand averages
-        rF["av"] = subpixelRegistration.alignFromDict(rF["av"],registration)
+        rF["av"] = SubpixelRegistration.alignFromDict(rF["av"],registration)
         ## Align the run averages (those are "volumes" so we need to set the z shift to 0)
         registration["shift"] = [registration["shift"];0]
-        rF["runAv"] = subpixelRegistration.alignFromDict(rF["runAv"],registration)
+        rF["runAv"] = SubpixelRegistration.alignFromDict(rF["runAv"],registration)
         ## Finally align the individual runs
         for rep in 1:length(rF["green"])
-            rF["green"][rep][:,:,:] = subpixelRegistration.alignFromDict(rF["green"][rep],registration)
+            rF["green"][rep][:,:,:] = SubpixelRegistration.alignFromDict(rF["green"][rep],registration)
         end
         rF
     end
