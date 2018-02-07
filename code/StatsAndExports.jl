@@ -227,21 +227,36 @@ stats_per_pair_20[(stats_per_pair_20[:cellPair].==cp),n][1] for
 ## For now we're exporting the stats for the drug free runs
 perRunDataDict = 
 Dict(exp => Dict(nP => Dict(string(n) => 
-unique(stats_per_run[(stats_per_run[:experiment].==exp) .& (stats_per_run[:nPulses_median].==nP) .& (stats_per_run[:preDrug]),
-    n]) for 
-                n in names(stats_per_run)) for
-    nP in stats_per_run[stats_per_run[:experiment].==exp,:nPulses_median]) for 
-    exp in unique(stats_per_run[:experiment]))
+                            unique(stats_per_run[(stats_per_run[:experiment].==exp) .& (stats_per_run[:nPulses_median].==nP) .& (stats_per_run[:preDrug]),
+                                                 n]) for 
+                            n in names(stats_per_run)) for
+                 nP in stats_per_run[stats_per_run[:experiment].==exp,:nPulses_median]) for 
+                     exp in unique(stats_per_run[:experiment]))
+
+## Drug exports
+mecaDataDict = 
+Dict(exp => Dict(string(n) => 
+                 unique(mecadf[(mecadf[:experiment].==exp),n]) for 
+                 n in names(mecadf)) for 
+     exp in unique(mecadf[:experiment]))
+
+picroDataDict = 
+Dict(exp =>  Dict(string(n) => 
+                  unique(picrodf[(picrodf[:experiment].==exp),n]) for 
+                  n in names(picrodf)) for 
+     exp in unique(picrodf[:experiment]))
 
 ## A table of drivers, used by the website
 drivers = Dict(td => convert(Array,
-        linesToType[linesToType[Symbol("Type Description")].== td,:Line]) for 
-                          td in unique(linesToType[Symbol("Type Description")]));
+                             linesToType[linesToType[Symbol("Type Description")].== td,:Line]) for 
+               td in unique(linesToType[Symbol("Type Description")]));
 writeJS("js/drivers.js","DRIVERS",drivers)
 
 writeJS("js/perRunData.js","PER_RUN_DATA",perRunDataDict)
 writeJS("js/neurontypes.js","NEURON_TYPES",neuronTypes)
 writeJS("js/summaryData.js","SUMMARY_DATA",summaryDataDict)
 writeJS("js/superSummary.js","SUPER_SUMMARY",superSummary)
-
+writeJS("js/mecaData.js","MECA_DATA",mecaDataDict)
+writeJS("js/picroData.js","PICRO_DATA",picroDataDict)
+                    
 
