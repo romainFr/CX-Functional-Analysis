@@ -244,3 +244,4 @@ writeJS("js/neurontypes.js","NEURON_TYPES",neuronTypes)
 writeJS("js/summaryData.js","SUMMARY_DATA",summaryDataDict)
 writeJS("js/superSummary.js","SUPER_SUMMARY",superSummary)
 
+
