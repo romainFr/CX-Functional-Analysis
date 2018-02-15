@@ -10,7 +10,6 @@ To run the analysis locally (recommended if you plan of analyzing a full dataset
 - At the Julia prompt, type :
 ```julia
   Pkg.add("PlotlyJS")
-  Pkg.clone("https://github.com/romainFr/FluorescentSeries.jl.git")
 ```
 - Download or clone this repository.
 - Data is stored in [this OpenScienceFramework page](https://osf.io/vsa3z/). Notebooks contain instructions to download it directly from ```Julia```.
