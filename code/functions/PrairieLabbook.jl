@@ -7,11 +7,11 @@ function readLabbook(tablePath,lines;expDay=nothing,tagExcl=":Problematic:",date
     labTable[:Runs] = collect(vcat(eval(parse(x))...) for x in Missings.replace(labTable[:Runs],"[0]"))
     labTable[:Region] = collect(eval(parse(x)) for x in Missings.replace(labTable[:Region],"Dict(\"Missing\" => [0])"))
     
-    labTableFinal = labTable[1,names(labTable) .!= :Region]
+    labTableFinal = similar(labTable,0)[:,names(labTable) .!= :Region]
     labTableFinal[:Region]="Missing"
     labTableFinal[:RegionRuns] = Missings.missing
     
-    for fly in 2:size(labTable)[1]
+    for fly in 1:size(labTable)[1]
         for reg in 1:length(labTable[:Region][fly])
             labLine = labTable[fly,names(labTable) .!= :Region]
             labLine[:Region] = collect(keys(labTable[:Region][fly]))[reg]
