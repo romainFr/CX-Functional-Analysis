@@ -73,17 +73,17 @@ end
 function makeStatHist(statDf,statN;kwargs...)
         stephist(statDf[statN],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[statN]),maximum(statDf[statN]),30),
-            title=fullNamesDF[statN][1],titlefontsize=10#,
-                 #color=["cornflowerblue" "coral" "green"]
+            title=fullNamesDF[statN][1],titlefontsize=10,
+                 color=[1 3 10]
                  ;kwargs...)
 end
 
 function makeStatHist!(statDf,pl,stat;kwargs...)
     stephist!(pl,statDf[stat],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[stat]),maximum(statDf[stat]),30),
-            xlab=""#,
-              #color=["cornflowerblue" "coral" "green"]
-              ;kwargs...)
+            xlab="",
+            color=[1 3 10]
+            ;kwargs...)
 end
 
 ## Matrix plot
@@ -155,9 +155,9 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
     drugDataS[isnan.(drugDataS)]=0
     postDataS[isnan.(postDataS)]=0
     
-    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,xlabel="Time (s)",label="",right_margin=10mm,top_margin=5mm,bottom_margin=15mm)
-    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="")
-    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="")
+    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,xlabel="Time (s)",label="",right_margin=10mm,top_margin=10mm,bottom_margin=10mm,lw=3,yticks=4)
+    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="",lw=3,yticks=4)
+    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="",lw=3,yticks=4)
     
     topvalue = maximum([maximum(preDataM.+preDataS),maximum(postDataM.+postDataS),maximum(drugDataM.+drugDataS)])+1
     plot!([0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
@@ -173,7 +173,7 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
         @set_attr :title cp
         @set_attr :hover _[2]
         @plot scatter!(legend=:none,
-                       ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",8),title_location=:right)
+                       ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",8),title_location=:right,yticks=4)
     end
     pairPlot
 end
