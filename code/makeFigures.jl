@@ -2,7 +2,7 @@
 using GroupedErrors
 using JLD2,DataFrames,AxisArrays,CSV,FileIO
 using PlotUtils, RecipesBase, StatPlots, StatsBase
-using LaTeXStrings, Measures
+using LaTeXStrings, Measures, CSV
 theme(:wong,gridcolor=:gray40,axiscolor=:gray50,
    textcolor=RGB(128/255,128/255,128/255),guidecolor=RGB(128/25,128/255,128/255),
     guidefontfamily="DejaVu Sans",guidefontsize=10,guidefontcolor=RGB(128/255,128/255,128/255) ,tickfont = ("DejaVu Sans",10),legendfont=("DejaVu Sans",10,RGB(128/255,128/255,128/255)),foreground_color=RGB(128/255,128/255,128/255),background_color=RGBA(1.0,1.0,1.0,0.0))
@@ -21,8 +21,15 @@ avg_data_dict = load("data/avgData.jld2")
 @load "data/drugTables.jld2"
 interpData = load("data/interpolatedData.jld2")
 
+linesToType = CSV.read("LinesAndTypes.csv",weakrefstrings=false)
+
 cellPairs = sort(unique(labbook[ismissing.(labbook[:TAGS]),:cellToCell]))
 genotypes = sort(unique(labbook[ismissing.(labbook[:TAGS]),:genotypeRegion]));
+
+mecadf[:shortPair] = 
+linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in mecadf[:preNeuron]],Symbol("New Type Name")].*" to ".*linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in mecadf[:postNeuron]],Symbol("New Type Name")]
+
+picrodf[:shortPair] = linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in picrodf[:preNeuron]],Symbol("New Type Name")].*" to ".*linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in picrodf[:postNeuron]],Symbol("New Type Name")]
 
 ## Figure "Responses" of the paper
 ## Selected example pairs
@@ -287,7 +294,7 @@ deltaMixedP = plot(deltaMixed...,layout=(1,4),size=(1500,500),title=["C i" "ii" 
 deltaL = @layout [g h
                   z]
 deltaFig = plot(deltaInhib,deltaExcit,deltaMixedP,layout=deltaL,size=(800,800),
-    bottom_margin=7mm,top_margin=5mm)
+    bottom_margin=7mm,top_margin=30mm)
 
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.svg")
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.pdf")

@@ -167,10 +167,10 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
     yend = min(maximum(df[df[:cellPair].==cp,:integNorm_scaled]),1.0)+0.1
     
     @> df[df[:cellPair].==cp,:] begin
-        @splitby (_.experiment,_.genotype)
+        @splitby (_.experiment,_.genotype,_.shortPair)
         @x _.timeToDrug
         @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
-        @set_attr :title cp
+        @set_attr :title _[3]
         @set_attr :hover _[2]
         @plot scatter!(legend=:none,
                        ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",8),title_location=:right,yticks=4)
