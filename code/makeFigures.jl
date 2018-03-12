@@ -75,7 +75,7 @@ direct = make_raw_plot(select_data(direct_pair,20,interpData,1:6,labbook),substr
     framestyle=:axes)
 
 figureResponseA = plot(excPlot,inhPlot,nothingPlot,weakPlot,confPlot,reboundPlot,layout = (2,3),
-        title = ["A i" "ii" "iii" "B i" "ii" "iii"],titleloc=:left,top_margin=30mm
+        title = ["A i" "ii" "iii" "B i" "ii" "iii"],ylabel=["Fluorescence (ΔF/F₀)" "" "" "" "" "" ""],titleloc=:left,top_margin=30mm
     ,size = (800,500),bottom_margin=7mm,link=:x)
 ## The top margin is to fit neuron schematics
 PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.svg")
@@ -83,7 +83,7 @@ PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.html",js=:remote)
 
 ## Plotting the control experiments
 null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:cellPair]))
-nullPlot = make_raw_plot(select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",lw=3)
+nullPlot = make_raw_plot(select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",lw=3,ylabel="Fluorescence (ΔF/F₀)")
 
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.svg")
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.html",js=:remote)
@@ -91,7 +91,7 @@ PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.html",js=:remote)
 ##
 figureResponseDLayout = grid(2,2,widths=[0.9,0.1],heights=[0.1,0.9])
 figureResponseDLayout[1,2].attr[:blank]=true
-figureResponseD = plot(layout=figureResponseDLayout,size=(600,600),xlabel="",ylabel="",legend=false,titlepos=:left)
+figureResponseD = plot(layout=figureResponseDLayout,size=(500,600),xlabel="",ylabel="",legend=false,titlepos=:left)
 
 makeStatHist!(stats_per_pair_20,figureResponseD,:between_runs_corr,subplot=1,grid=false,link=:x,axis=:x,ticks=nothing,top_margin=15mm,label="",title="D",color=[1 6 9])
 
@@ -294,13 +294,13 @@ deltaInhib = make_raw_plot(select_data(inhibPair,20,
  
 deltaExcit = make_raw_plot(select_data(excitPair,20,interpData,1:6,labbook),
     scalebar=false,substract=false,xlabel = "Time (seconds)", 
-    ylabel = "Fluorescence", title = "B",titleloc=:left,right_margin=3mm)
+    ylabel = "Fluorescence (ΔF/F₀)", title = "B",titleloc=:left,right_margin=3mm)
 
 deltaMixed = [make_raw_plot(select_data(mixedPair,p,interpData,1:6,labbook),
         scalebar=false,substract=false,np=p) for p in [5,10,20,30]]
 
 deltaMixedP = plot(deltaMixed...,layout=(1,4),size=(1500,500),title=["C i" "ii" "iii" "iv"],titleloc=:left,
-    ylabel=["Fluorescence" "" "" ""],xlabel=["" "" "" "Time (seconds)"],right_margin=3mm,left_margin=3mm)
+    ylabel=["Fluorescence (ΔF/F₀)" "" "" ""],xlabel=["" "" "" "Time (seconds)"],right_margin=3mm,left_margin=3mm)
 
 deltaL = @layout [g h
                   z]
@@ -308,5 +308,4 @@ deltaFig = plot(deltaInhib,deltaExcit,deltaMixedP,layout=deltaL,size=(800,800),
     bottom_margin=7mm,top_margin=30mm)
 
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.svg")
-PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.pdf")
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.html",js=:remote)
