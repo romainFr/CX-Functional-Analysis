@@ -73,16 +73,14 @@ end
 function makeStatHist(statDf,statN;kwargs...)
         stephist(statDf[statN],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[statN]),maximum(statDf[statN]),30),
-            title=fullNamesDF[statN][1],titlefontsize=10,
-                 color=[1 3 10]
+                 title=fullNamesDF[statN][1],titlefontsize=10
                  ;kwargs...)
 end
 
 function makeStatHist!(statDf,pl,stat;kwargs...)
     stephist!(pl,statDf[stat],group=statDf[:expType],fill=true,alpha=0.4,normalize=:none,
             nbins=linspace(minimum(statDf[stat]),maximum(statDf[stat]),30),
-            xlab="",
-            color=[1 3 10]
+              xlab=""
             ;kwargs...)
 end
 

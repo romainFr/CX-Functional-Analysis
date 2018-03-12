@@ -3,10 +3,20 @@ using GroupedErrors
 using JLD2,DataFrames,AxisArrays,CSV,FileIO
 using PlotUtils, RecipesBase, StatPlots, StatsBase
 using LaTeXStrings, Measures, CSV
-theme(:wong,gridcolor=:gray40,axiscolor=:gray50,
+
+myPalette = [colorant"#94a6fd",
+             colorant"#841ea4",
+             colorant"#69b7c5",
+             colorant"#085782",
+             colorant"#da73f8",
+             colorant"#21a645",
+             colorant"#285d28",
+             colorant"#9db46a"]
+            
+#theme()
+plotlyjs(palette=PlotThemes.expand_palette(colorant"white", myPalette; lchoices=linspace(57,57,1), cchoices=linspace(100,100,1)),gridcolor=:gray40,axiscolor=:gray50,
    textcolor=RGB(128/255,128/255,128/255),guidecolor=RGB(128/25,128/255,128/255),
     guidefontfamily="DejaVu Sans",guidefontsize=10,guidefontcolor=RGB(128/255,128/255,128/255) ,tickfont = ("DejaVu Sans",10),legendfont=("DejaVu Sans",10,RGB(128/255,128/255,128/255)),foreground_color=RGB(128/255,128/255,128/255),background_color=RGBA(1.0,1.0,1.0,0.0))
-plotlyjs()
 
 include("code/functions/plot-utilities.jl")
 
@@ -73,23 +83,27 @@ PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.html",js=:remote)
 
 ## Plotting the control experiments
 null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:cellPair]))
+nullPlot = make_raw_plot(select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",lw=3)
 
-figureResponseDLayout = @layout [i grid(2,2,widths=[0.9,0.1],heights=[0.1,0.9])]
-figureResponseDLayout[1,2][1,2].attr[:blank]=true
-figureResponseD = plot(layout=figureResponseDLayout,size=(800,400),xlabel="",ylabel="",legend=false,titlepos=:left)
+PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.svg")
+PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.html",js=:remote)
 
-make_raw_plot!(figureResponseD,select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",subplot=1,title="D i",lw=3)
-makeStatHist!(stats_per_pair_20,figureResponseD,:between_runs_corr,subplot=2,grid=false,link=:x,axis=:x,ticks=nothing,top_margin=15mm,label="",title="ii")
+##
+figureResponseDLayout = grid(2,2,widths=[0.9,0.1],heights=[0.1,0.9])
+figureResponseDLayout[1,2].attr[:blank]=true
+figureResponseD = plot(layout=figureResponseDLayout,size=(600,600),xlabel="",ylabel="",legend=false,titlepos=:left)
 
-makeStatHist!(stats_per_pair_20,figureResponseD,:integNormScaled,subplot=4,orientation=:h,grid=false,axis=:y,ticks=nothing,ylim=(-1.05,1.05),xlim = (0,18),legend=(0.67,1.02))
+makeStatHist!(stats_per_pair_20,figureResponseD,:between_runs_corr,subplot=1,grid=false,link=:x,axis=:x,ticks=nothing,top_margin=15mm,label="",title="D",color=[1 6 9])
+
+makeStatHist!(stats_per_pair_20,figureResponseD,:integNormScaled,subplot=3,orientation=:h,grid=false,axis=:y,ticks=nothing,ylim=(-1.05,1.05),xlim = (0,18),legend=(0.4,1.02),color=[1 6 9])
  
 @df stats_per_pair_20 scatter!(figureResponseD,:between_runs_corr,:integNormScaled,
                                group=(:signif1,:expType),
-                               color=[1 3 1 3 10],
+                               color=[1 6 1 6 9],
                                msw=[0 0 1 1 1],msa=1,
                                malpha=0.4,msc=:gray30,
                                ylab="Scaled normalized integral",xlab="Between-flies correlation",
-                               hover=:cellPair,subplot=3,msize=6,ylim=(-1.05,1.05),link=:x
+                               hover=:cellPair,subplot=2,msize=6,ylim=(-1.05,1.05),link=:x
                                ,label=["" "" "" "" "Significant response"])
 
 ## There's still a hack in here, because orientation switching does weird things with plotlyjs (axis limits and 
@@ -97,6 +111,8 @@ makeStatHist!(stats_per_pair_20,figureResponseD,:integNormScaled,subplot=4,orien
 
 PlotlyJS.savefig(figureResponseD.o,"plots/figureResponsesD.svg")
 PlotlyJS.savefig(figureResponseD.o,"plots/figureResponsesD.html",js=:remote)
+
+
 
 fullNamesDF = DataFrame(integNorm = "Normalized integral", 
                         integNormScaled = "Scaled normalized integral",
@@ -113,12 +129,11 @@ fullNamesDF = DataFrame(integNorm = "Normalized integral",
                         responding = "Responding");
  
 
-statHists = [makeStatHist(stats_per_pair_20,names(fullNamesDF)[1]),[makeStatHist(stats_per_pair_20,s,label="") for s in names(fullNamesDF)[2:10]]...]
+statHists = [makeStatHist(stats_per_pair_20,names(fullNamesDF)[1],color=[1 6 9]),[makeStatHist(stats_per_pair_20,s,label="",color=[1 6 9]) for s in names(fullNamesDF)[2:10]]...]
 
 statsHistsGridBig = plot(statHists...,layout=(5,2),size=(700,700),legend=(0.8,0.97),margin=5mm)
 
 PlotlyJS.savefig(statsHistsGridBig.o,"plots/statistics_histograms_SI.svg")
-PlotlyJS.savefig(statsHistsGridBig.o,"plots/statistics_histograms_SI.pdf")
 PlotlyJS.savefig(statsHistsGridBig.o,"plots/statistics_histograms_SI.html",js=:remote)
 
 
@@ -142,7 +157,7 @@ baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:
     size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline",
                                                                      whisker_width=0.5,xticks=[],
                                                                      linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,
-                                                                     hover=:cellPair,legend=(0.35,0.92),color=[1 3 10])
+                                                                     hover=:cellPair,legend=(0.35,0.92),color=[1 6 9])
 
 baselineDistsSummary = @df stats_per_run[stats_per_run[:preDrug],:] violin(:expType,:baseline_median,
     size=(350,300),ylabel="Single run baseline",ylims=(0,10),legend=:none,color="gray80",label="")
@@ -159,7 +174,7 @@ stateDependenceSummary = @df stats_per_pair_20 boxplot(:globalSignif,
     xlim=(-1.6,1.5),
     legend=:none,label="")
 
-colorsF = Dict("i"=>3,"ii"=>3,"iii"=>3,"iv"=>10)
+colorsF = Dict("i"=>6,"ii"=>6,"iii"=>6,"iv"=>9)
 ylimsF = Dict("i"=>(0,5),"ii"=>(-1,0.2),"iii"=>(0,0.2),"iv"=>(0,6))
 
 figureExampleState = [@df select_data(pairs_for_figureResp[x],20,avg_data_dict,1:6,labbook,
@@ -186,7 +201,6 @@ baselineSIFig = plot(baselineDists,baselineDistsSummary,stateDependenceSummary,f
     top_margin=5mm,bottom_margin=7mm,title=["A" "B" "C" "Di" "ii" "iii" "iv"],titleloc=:left,legend=(0.35,0.97))
 
 PlotlyJS.savefig(baselineSIFig.o,"plots/baselineSIFig.svg")
-PlotlyJS.savefig(baselineSIFig.o,"plots/baselineSIFig.pdf")
 PlotlyJS.savefig(baselineSIFig.o,"plots/baselineSIFig.html",js=:remote)
 
 doseRespPlot = @> stats_per_pair begin 
@@ -207,7 +221,6 @@ end
 end
 
 PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.svg")
-PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.pdf")
 PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.html",js=:remote)
 
 #Blink.AtomShell.install()
@@ -244,7 +257,6 @@ mecaPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                  layout=mecaLayout,size=(800,1700),legend=(0.75,0.2))
 
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.svg")
-PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.pdf")
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.html",js=:remote)
 
 
@@ -269,7 +281,6 @@ picroPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
                   )
 
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.svg")
-PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.pdf")
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.html",js=:remote)
 
 inhibPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"
@@ -279,7 +290,7 @@ mixedPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.b-EBw.s-DV_GA.b"
 deltaInhib = make_raw_plot(select_data(inhibPair,20,
                                        #avg_data_dict
                                        interpData,1:6,labbook),scalebar=false,substract=false,
-    substract=false,xlabel = "Time (seconds)", ylabel = "Fluorescence", title = "A",titleloc=:left,right_margin=3mm)
+    substract=false,xlabel = "Time (seconds)", ylabel = "Fluorescence (ΔF/F₀)", title = "A",titleloc=:left,right_margin=3mm)
  
 deltaExcit = make_raw_plot(select_data(excitPair,20,interpData,1:6,labbook),
     scalebar=false,substract=false,xlabel = "Time (seconds)", 
