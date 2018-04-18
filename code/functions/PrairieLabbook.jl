@@ -1,7 +1,7 @@
 
 ### Import the labbook table selecting certain values for a sub-table (returns two dataframes, the full one and the subset).
 function readLabbook(tablePath,lines;expDay=nothing,tagExcl=":Problematic:",dateFmt="yyyy-mm-dd e")
-    labTable = CSV.read(tablePath,null="NA",dateformat=dateFmt,weakrefstrings=false,quotechar=''')#readtable(tablePath,nastrings=["NA"])
+    labTable = CSV.read(tablePath,null="NA",dateformat=dateFmt,weakrefstrings=false,quotechar=''',allowmissing=:auto)#readtable(tablePath,nastrings=["NA"])
 
     labTable[:folderName] = lowercase.(Dates.format(labTable[:TIMESTAMP],"uddyy"))
     labTable[:Runs] = collect(vcat(eval(parse(x))...) for x in Missings.replace(labTable[:Runs],"[0]"))
