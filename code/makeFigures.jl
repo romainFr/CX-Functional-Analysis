@@ -41,6 +41,8 @@ linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in mec
 
 picrodf[:shortPair] = linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in picrodf[:preNeuron]],Symbol("New Type Name")].*" to ".*linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in picrodf[:postNeuron]],Symbol("New Type Name")]
 
+stats_per_run[:shortPair] = linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in stats_per_run[:preNeuron]],Symbol("New Type Name")].*" to ".*linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in stats_per_run[:postNeuron]],Symbol("New Type Name")]
+
 ## Figure "Responses" of the paper
 ## Selected example pairs
 
@@ -83,7 +85,10 @@ PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.html",js=:remote)
 
 ## Plotting the control experiments
 null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:cellPair]))
-nullPlot = make_raw_plot(select_data(null_pairs,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,traceW=1,right_margin=10mm,top_margin=10mm,label="",lw=3,ylabel="Fluorescence (ΔF/F₀)")
+null_pairs_short = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:shortPair]))
+nullPlots = [make_raw_plot(select_data(np,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,right_margin=10mm,top_margin=10mm,label="",lw=3,ylabel="Fluorescence (ΔF/F₀)") for np in null_pairs]
+
+nullPlot = plot(nullPlots...,plot(),plot(),plot(),layout=(4,6),size=(1500,800),link=:x,title=reshape([null_pairs_short...,"","",""],1,length(null_pairs_short)+3),bottom_margin=10mm,left_margin=10mm)
 
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.svg")
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.html",js=:remote)
