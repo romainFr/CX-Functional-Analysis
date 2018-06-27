@@ -43,6 +43,8 @@ picrodf[:shortPair] = linesToType[[findfirst(linesToType[Symbol("Type Descriptio
 
 stats_per_run[:shortPair] = linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in stats_per_run[:preNeuron]],Symbol("New Type Name")].*" to ".*linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in stats_per_run[:postNeuron]],Symbol("New Type Name")]
 
+uniqueTypesShort = linesToType[[findfirst(linesToType[Symbol("Type Description")],pn) for pn in uniqueTypesUsed],Symbol("New Type Name")]
+uniqueTypesShort = convert(Array{String,1},uniqueTypesShort)
 ## Figure "Responses" of the paper
 ## Selected example pairs
 

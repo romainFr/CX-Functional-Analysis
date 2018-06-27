@@ -100,17 +100,17 @@ function getMat(I,J,column)
     mat
 end
 
-function makeMatrixPlot(statUsed;kwargs...)
+function makeMatrixPlot(statUsed,namesUsed;kwargs...)
     mat = statsMatrices[statUsed]
     matVals = filter(x->!isnan(x),mat)
     grad = ColorGradient(ColorGradient(:bluesreds).colors,[0,-minimum(matVals)/(maximum(matVals)-minimum(matVals)),1.0])
 
-    themat = heatmap(uniqueTypesUsed, uniqueTypesUsed, mat,aspect_ratio=1,
+    themat = heatmap(namesUsed, namesUsed, mat,aspect_ratio=1,
                      color=grad,
                      xrotation=90
                      ,yguide="Presynaptic candidate",xguide="Postsynaptic candidate",
-                     xticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed),
-                     yticks = (0.5:1:length(uniqueTypesUsed)-0.5,uniqueTypesUsed);
+                     xticks = (0.5:1:length(namesUsed)-0.5,namesUsed),
+                     yticks = (0.5:1:length(namesUsed)-0.5,namesUsed);
                      kwargs...
          )
     plot!(themat,identity,line=(:grey80,:dot),lab="")
