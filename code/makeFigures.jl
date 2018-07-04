@@ -154,7 +154,7 @@ matGuesses = transpose(full(sparse(Is, Js, stats_per_pair_20[:expType].=="Overla
         length(uniqueTypesUsed),length(uniqueTypesUsed))))
 
 matDistance = 
-makeMatrixPlot("distanceN",size=(1000,1000),title="B",title_location=:left,top_margin=5mm,tickfontsize=9,legend=(0.1,0.2))
+       makeMatrixPlot("distanceN",uniqueTypesShort,size=(1000,1000),title_location=:left,top_margin=5mm,tickfontsize=9,legend=(0.02,-0.01))
 
 PlotlyJS.savefig(matDistance.o,"plots/matDistance.svg")
 PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)

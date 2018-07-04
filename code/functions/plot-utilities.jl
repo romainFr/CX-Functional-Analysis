@@ -127,9 +127,10 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
     preData = []
     drugData = []
     postData = []
+    df[:isWash] = false
     for expe in unique(df[df[:cellPair].==cp,:experiment])
         subDf = df[df[:experiment].==expe,:]
-      
+        df[find(df[:experiment].==expe)[(size(subDf,1)-1):size(subDf,1)],:isWash]=true
         runPre = subDf[subDf[:timeToDrug].<=2,:runIdx]
         runDrug = subDf[(10.<subDf[:timeToDrug].<15),:runIdx]
         runWash = subDf[(size(subDf,1)-1):size(subDf,1),:runIdx]
@@ -153,16 +154,12 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
     drugDataS[isnan.(drugDataS)]=0
     postDataS[isnan.(postDataS)]=0
     
-    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,xlabel="Time (s)",label="",right_margin=10mm,top_margin=10mm,bottom_margin=10mm,lw=3,yticks=4)
-    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="",lw=3,yticks=4)
-    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="",lw=3,yticks=4)
-    
-    topvalue = maximum([maximum(preDataM.+preDataS),maximum(postDataM.+postDataS),maximum(drugDataM.+drugDataS)])+1
-    plot!([0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
-        fillrange=0,line=:path,subplot=1+subStart,label="")
 
-    ystart = max(minimum(df[df[:cellPair].==cp,:integNorm_scaled]),-1.0)-0.1
-    yend = min(maximum(df[df[:cellPair].==cp,:integNorm_scaled]),1.0)+0.1
+    topvalue = maximum([maximum(preDataM.+preDataS),maximum(postDataM.+postDataS),maximum(drugDataM.+drugDataS)])+0.2
+    
+
+    ystart = max(minimum(df[df[:cellPair].==cp,:integNorm_scaled]),-1.0)-0.05
+    yend = min(maximum(df[df[:cellPair].==cp,:integNorm_scaled]),1.0)+0.05
     
     @> df[df[:cellPair].==cp,:] begin
         @splitby (_.experiment,_.genotype,_.shortPair)
@@ -170,8 +167,45 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
         @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
         @set_attr :title _[3]
         @set_attr :hover _[2]
-        @plot scatter!(legend=:none,
-                       ylabel="Response integral",xlabel="Time to drug",subplot=subStart,msw=0,ylim=(ystart,yend),label="",titlefont=font("DejaVu Sans",8),title_location=:right,yticks=4)
+       # @set_attr :color _[4] ? 3 : :gray40
+        @plot plot!(legend=:none,
+                    subplot=subStart,msw=0,label="",color=:gray40,title_location=:right,width=3,alpha=0.6,xaxis=false,link=:x,ylim=(ystart,yend))
     end
+    
+ @> df[(df[:cellPair].==cp) .& df[:isWash],:] begin
+        @splitby (_.experiment,_.genotype,_.shortPair,_.isWash)
+        @x _.timeToDrug
+        @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
+        @plot plot!(legend=:none,
+                    subplot=subStart,msw=0,label="",color=3,title_location=:right,width=3,alpha=0.6,xaxis=false,link=:x,ylim=(ystart,yend))
+    end
+    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,label="",lw=3,top_margin=7mm,bottom_margin=5mm,framestyle=:none,link=:x)
+    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="",lw=3)
+    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="",lw=3)
+
+    plot!([0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
+        fillrange=0,line=:path,subplot=1+subStart,label="")
+
+    plot!([-2;8],[0;0],color=:gray80,line=(3,:dash),subplot=1+subStart,label="")
+
+    plot!([0;0],[ystart;yend],color=:gray40,line=(3,:dash),subplot=subStart,label="")
+
+    ## Adding shading for the different periods
+    ## Control
+    bar!([-4;0],[yend;yend],color=1,fill=1,alpha=0.3,
+        line=:path,subplot=subStart,label="")
+    plot!([-4;0],[ystart;ystart],color=1,fill=1,alpha=0.3,
+        line=:path,subplot=subStart,label="")
+
+    ## Drug
+    plot!([10;15],[ystart;ystart],color=2,fill=2,alpha=0.3,
+        line=:path,subplot=subStart,label="")
+    plot!([10;15],[yend;yend],color=2,fill=2,alpha=0.3,
+        line=:path,subplot=subStart,label="")
+
+    ## Scale Bars
+    plot!([9.3,9.3],[1;2],color=:gray40,lw=4,subplot=1+subStart,label="")
+    
+    
     pairPlot
 end
