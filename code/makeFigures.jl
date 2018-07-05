@@ -88,9 +88,11 @@ PlotlyJS.savefig(figureResponseA.o,"plots/figureResponseAPlots.html",js=:remote)
 ## Plotting the control experiments
 null_pairs = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:cellPair]))
 null_pairs_short = convert(Array{String},unique(stats_per_run[stats_per_run[:expType].=="Non overlapping",:shortPair]))
-nullPlots = [make_raw_plot(select_data(np,20,interpData,1:6,labbook),substract=true,scalebar=true,framestyle=:axes,axis=:y,colorV=:cellPair,right_margin=10mm,top_margin=10mm,label="",lw=3,ylabel="Fluorescence (ΔF/F₀)") for np in null_pairs]
+nullPlots = [make_raw_plot(select_data(np,20,interpData,1:6,labbook),substract=true,scalebar=false,framestyle=:axes,colorV=:cellPair,right_margin=5mm,top_margin=5mm,label="",lw=3) for np in null_pairs]
 
-nullPlot = plot(nullPlots...,plot(),plot(),plot(),layout=(4,6),size=(1500,800),link=:x,title=reshape([null_pairs_short...,"","",""],1,length(null_pairs_short)+3),bottom_margin=10mm,left_margin=10mm)
+nullPlots[10].subplots[1].attr[:yaxis][:guide] = "Fluorescence (ΔF/F₀)"
+
+nullPlot = plot(nullPlots...,layout=(7,3),size=(750,1400),link=:x,title=reshape([null_pairs_short...,"","",""],1,length(null_pairs_short)+3),xlab="Time (s)")
 
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.svg")
 PlotlyJS.savefig(nullPlot.o,"plots/SIFigureNonOverlapping.html",js=:remote)
@@ -236,55 +238,41 @@ PlotlyJS.savefig(doseRespPlot.o,"plots/doseRespSI.html",js=:remote)
 
 #drugStats[:globalSignif]=stats_per_pair_20[:globalSignif][[findin(stats_per_pair_20[:cellPair],[s])[1] for s in drugStats[:cellPair]]];
 
-#mecaEffectPlots = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[:cellPair]))]
 
-mecaISP = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[mecadf[:preNeuron].=="PBG2-9.b-IB.s.SPS.s" ,:cellPair]))]
+mecaISP = vcat([makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[mecadf[:preNeuron].=="PBG2-9.b-IB.s.SPS.s" ,:cellPair]))]...)
 
-mecaColu = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="PBG2-9.s-EBt.b-NO1.b.Type1").| (mecadf[:preNeuron].=="PBG1-7.s-FBl2.s-LAL.b-cre.b") .| (mecadf[:preNeuron].=="PBG1-8.b-EBw.s-DV_GA.b") .| (mecadf[:preNeuron].=="PBG1-8.s-EBt.b-DV_GA.b"),:cellPair]))]
+mecaColu = vcat([makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="PBG2-9.s-EBt.b-NO1.b.Type1").| (mecadf[:preNeuron].=="PBG1-7.s-FBl2.s-LAL.b-cre.b") .| (mecadf[:preNeuron].=="PBG1-8.b-EBw.s-DV_GA.b") .| (mecadf[:preNeuron].=="PBG1-8.s-EBt.b-DV_GA.b"),:cellPair]))]...)
 
-mecaOthers = [makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="EB.w-AMP.d-D_GAsurround").| (mecadf[:preNeuron].=="PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b") ,:cellPair]))]
+mecaOthers = vcat([makePairDrugPlots(mecadf,cp) for cp in sort(unique(mecadf[(mecadf[:preNeuron].=="EB.w-AMP.d-D_GAsurround").| (mecadf[:preNeuron].=="PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b") ,:cellPair]))]...)
 
-mecaOthers[1].subplots[2].series_list[1][:label] = "Control"
-mecaOthers[1].subplots[2].series_list[2][:label] = "Mecamylamine"
-mecaOthers[1].subplots[2].series_list[3][:label] = "Wash"
+mecaOthers[2].subplots[1].series_list[1][:label] = "Control"
+mecaOthers[2].subplots[1].series_list[2][:label] = "Mecamylamine"
+mecaOthers[2].subplots[1].series_list[3][:label] = "Wash"
+mecaColu[17].subplots[1].attr[:yaxis][:guide] = "Scaled normalized integral"
 
-mecaLayout = @layout [a{0.01h}
-                      grid(5,2){0.67h}
-                      b{0.01h}
-                      grid(2,2){0.23h}
-                      c{.01h}
-                      grid(1,2){0.07h}]
-
-mecaPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
+mecaPlots = plot(
                  mecaColu...,
-                 plot(title="B",title_location=:left,framestyle=:none),
-                 mecaISP...,plot(),
-                 plot(title="C",title_location=:left,framestyle=:none),
+                 mecaISP...,plot(),plot(),
                  mecaOthers...,
-                 layout=mecaLayout,size=(800,1700),legend=(0.75,0.2))
+                 layout=grid(8,4),size=(800,1700),legend=(0.75,0.15),link=:x,xlab=["Time to drug (min)" "Time (s)"])
 
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.svg")
 PlotlyJS.savefig(mecaPlots.o,"plots/mecaPlots.html",js=:remote)
 
 
-picroInhib = [makePairDrugPlots(picrodf,cp) for cp in ["EBIRP I-O-LAL.s-to-PBG1-8.b-EBw.s-DV_GA.b","EBORP O-I-GA-Bulb-to-PBG1-8.b-EBw.s-DV_GA.b","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"]]
+picroInhib = vcat([makePairDrugPlots(picrodf,cp) for cp in ["EBIRP I-O-LAL.s-to-PBG1-8.b-EBw.s-DV_GA.b","EBORP O-I-GA-Bulb-to-PBG1-8.b-EBw.s-DV_GA.b","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","LAL.s-GAi.s-NO1i.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"]]...)
 
-picroControl = [makePairDrugPlots(picrodf,cp) for cp in ["PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-FBl1.b-NO3PM.b","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.b-IB.s.SPS.s","PBG2-9.b-IB.s.SPS.s-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG2-9.b-IB.s.SPS.s-to-PBG1-8.b-EBw.s-DV_GA.b"    ,"PBG2-9.b-IB.s.SPS.s-to-PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b" ,"PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","EB.w-AMP.d-D_GAsurround-to-PBG1-8.b-EBw.s-DV_GA.b"]]
+picroControl = vcat([makePairDrugPlots(picrodf,cp) for cp in ["PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.s-FBl1.b-NO3PM.b","PBG1-8.b-EBw.s-DV_GA.b-to-PBG2-9.b-IB.s.SPS.s","PBG2-9.b-IB.s.SPS.s-to-PBG2-9.s-EBt.b-NO1.b.Type1","PBG2-9.b-IB.s.SPS.s-to-PBG1-8.b-EBw.s-DV_GA.b"    ,"PBG2-9.b-IB.s.SPS.s-to-PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b" ,"PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-EBt.b-NO1.b.Type2","EB.w-AMP.d-D_GAsurround-to-PBG1-8.b-EBw.s-DV_GA.b"]]...)
 
-picroInhib[1].subplots[2].series_list[1][:label] = "Control"
-picroInhib[1].subplots[2].series_list[2][:label] = "Picrotoxin"
-picroInhib[1].subplots[2].series_list[3][:label] = "Wash"
+picroInhib[2].subplots[1].series_list[1][:label] = "Control"
+picroInhib[2].subplots[1].series_list[2][:label] = "Picrotoxin"
+picroInhib[2].subplots[1].series_list[3][:label] = "Wash"
+picroControl[1].subplots[1].attr[:yaxis][:guide] = "Scaled normalized integral"
 
-picroLayout = @layout [a{0.01h}
-                       grid(3,2){0.42h}
-                       b{0.01h}
-                       grid(4,2){0.56h}]
-
-picroPlots = plot(plot(title="A",title_location=:left,framestyle=:none),
-                  picroInhib...,plot(),
-                  plot(title="B",title_location=:left,framestyle=:none),
+picroPlots = plot(
+                  picroInhib...,plot(),plot(),
                   picroControl...,
-                  layout=picroLayout,size=(800,1500),legend=(0.75,0.6)
+                  layout=grid(7,4),size=(800,1500),legend=(0.75,0.6),link=:x,xlab=["Time to drug (min)" "Time (s)"]
                   )
 
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.svg")
@@ -297,17 +285,17 @@ mixedPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.b-EBw.s-DV_GA.b"
 deltaInhib = make_raw_plot(select_data(inhibPair,20,
                                        #avg_data_dict
                                        interpData,1:6,labbook),scalebar=false,substract=false,
-    substract=false,xlabel = "Time (seconds)", ylabel = "Fluorescence (ΔF/F₀)", title = "A",titleloc=:left,right_margin=3mm)
+    substract=false,xlabel = "Time (s)", ylabel = "Fluorescence (ΔF/F₀)", title = "A",titleloc=:left,right_margin=3mm)
  
 deltaExcit = make_raw_plot(select_data(excitPair,20,interpData,1:6,labbook),
-    scalebar=false,substract=false,xlabel = "Time (seconds)", 
+    scalebar=false,substract=false,xlabel = "Time (s)", 
     ylabel = "Fluorescence (ΔF/F₀)", title = "B",titleloc=:left,right_margin=3mm)
 
 deltaMixed = [make_raw_plot(select_data(mixedPair,p,interpData,1:6,labbook),
         scalebar=false,substract=false,np=p) for p in [5,10,20,30]]
 
 deltaMixedP = plot(deltaMixed...,layout=(1,4),size=(1500,500),title=["C i" "ii" "iii" "iv"],titleloc=:left,
-    ylabel=["Fluorescence (ΔF/F₀)" "" "" ""],xlabel=["" "" "" "Time (seconds)"],right_margin=3mm,left_margin=3mm)
+    ylabel=["Fluorescence (ΔF/F₀)" "" "" ""],xlabel=["" "" "" "Time (s)"],right_margin=3mm,left_margin=3mm)
 
 deltaL = @layout [g h
                   z]

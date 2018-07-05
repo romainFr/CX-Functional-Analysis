@@ -63,7 +63,7 @@ function make_raw_plot!(p,dataset;substract=false,scalebar=true,scaley=3,np=20,c
             lw=traceW;kwargs...)
         topvalue = max(maximum(d),topvalue)
     end
-    plot!(p,[0;0.033*np],[topvalue+1;topvalue+1],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path;kwargs...)
+    plot!(p,[0;0.033*np],[topvalue+0.5;topvalue+0.5],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path;kwargs...)
     if scalebar
         plot!(p,[6;8],[scaley-1;scaley-1],color=:gray50,line=:path,lw=3;kwargs...)
     end
@@ -118,12 +118,12 @@ function makeMatrixPlot(statUsed,namesUsed;kwargs...)
     themat
 end
 
-function makePairDrugPlots(df,cp)
-    pairPlot = plot(layout=(1,2))
-    makePairDrugPlots!(pairPlot,df,cp,1)
-end
+#function makePairDrugPlots(df,cp;kwargs...)
+#    pairPlot = plot(layout=(1,2);kwargs...)
+#    makePairDrugPlots!(pairPlot,df,cp,1)
+#end
 # Drug summaries
-function makePairDrugPlots!(pairPlot,df,cp,subStart)
+function makePairDrugPlots(df,cp;drugTime=[6;11])
     preData = []
     drugData = []
     postData = []
@@ -132,7 +132,7 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
         subDf = df[df[:experiment].==expe,:]
         df[find(df[:experiment].==expe)[(size(subDf,1)-1):size(subDf,1)],:isWash]=true
         runPre = subDf[subDf[:timeToDrug].<=2,:runIdx]
-        runDrug = subDf[(10.<subDf[:timeToDrug].<15),:runIdx]
+        runDrug = subDf[(drugTime[1].<subDf[:timeToDrug].<drugTime[2]),:runIdx]
         runWash = subDf[(size(subDf,1)-1):size(subDf,1),:runIdx]
         # Within fly means
         push!(preData,squeeze(mean(cat(2,[interpData[expe][i][1] for i in runPre]...),2),2))
@@ -160,52 +160,52 @@ function makePairDrugPlots!(pairPlot,df,cp,subStart)
 
     ystart = max(minimum(df[df[:cellPair].==cp,:integNorm_scaled]),-1.0)-0.05
     yend = min(maximum(df[df[:cellPair].==cp,:integNorm_scaled]),1.0)+0.05
-    
-    @> df[df[:cellPair].==cp,:] begin
-        @splitby (_.experiment,_.genotype,_.shortPair)
-        @x _.timeToDrug
-        @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
-        @set_attr :title _[3]
-        @set_attr :hover _[2]
-       # @set_attr :color _[4] ? 3 : :gray40
-        @plot plot!(legend=:none,
-                    subplot=subStart,msw=0,label="",color=:gray40,title_location=:right,width=3,alpha=0.6,xaxis=false,link=:x,ylim=(ystart,yend))
-    end
+
+    plotTimeCourse = @> df[df[:cellPair].==cp,:] begin
+                        @splitby (_.experiment,_.genotype,_.shortPair)
+                        @x _.timeToDrug
+                        @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
+                        @set_attr :title _[3]
+                        @set_attr :hover _[2]
+                        # @set_attr :color _[4] ? 3 : :gray40
+                        @plot plot(legend=:none,msw=0,label="",color=:gray40,title_location=:right,width=3,alpha=0.6,link=:x,ylim=(ystart,yend))
+                        end
     
  @> df[(df[:cellPair].==cp) .& df[:isWash],:] begin
         @splitby (_.experiment,_.genotype,_.shortPair,_.isWash)
         @x _.timeToDrug
         @y _.integNorm_scaled#_.integral_to_peak_scaled #_.distanceNorm 
-        @plot plot!(legend=:none,
-                    subplot=subStart,msw=0,label="",color=3,title_location=:right,width=3,alpha=0.6,xaxis=false,link=:x,ylim=(ystart,yend))
+        @plot plot!(plotTimeCourse,legend=:none,
+                    msw=0,label="",color=3,title_location=:right,width=3,alpha=0.6,link=:x,ylim=(ystart,yend))
     end
-    plot!(preDataM,ribbon=preDataS,subplot=subStart+1,label="",lw=3,top_margin=7mm,bottom_margin=5mm,framestyle=:none,link=:x)
-    plot!(drugDataM,ribbon=drugDataS,subplot=subStart+1,label="",lw=3)
-    plot!(postDataM,ribbon=postDataS,subplot=subStart+1,label="",lw=3)
 
-    plot!([0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
-        fillrange=0,line=:path,subplot=1+subStart,label="")
+    plotAv = plot(preDataM,ribbon=preDataS,label="",lw=3,top_margin=7mm,bottom_margin=5mm,yaxis=false,link=:x)
+    plot!(plotAv,drugDataM,ribbon=drugDataS,label="",lw=3)
+    plot!(plotAv,postDataM,ribbon=postDataS,label="",lw=3)
 
-    plot!([-2;8],[0;0],color=:gray80,line=(3,:dash),subplot=1+subStart,label="")
+    plot!(plotAv,[0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,
+        fillrange=0,line=:path,label="")
 
-    plot!([0;0],[ystart;yend],color=:gray40,line=(3,:dash),subplot=subStart,label="")
+    plot!(plotAv,[-2;8],[0;0],color=:gray80,line=(3,:dash),label="")
+
+    plot!(plotTimeCourse,[0;0],[ystart;yend],color=:gray40,line=(3,:dash),label="")
 
     ## Adding shading for the different periods
     ## Control
-    bar!([-4;0],[yend;yend],color=1,fill=1,alpha=0.3,
-        line=:path,subplot=subStart,label="")
-    plot!([-4;0],[ystart;ystart],color=1,fill=1,alpha=0.3,
-        line=:path,subplot=subStart,label="")
+    bar!(plotTimeCourse,[-4;0],[yend;yend],color=1,fill=1,alpha=0.3,
+        line=:path,label="")
+    plot!(plotTimeCourse,[-4;0],[ystart;ystart],color=1,fill=1,alpha=0.3,
+        line=:path,label="")
 
     ## Drug
-    plot!([10;15],[ystart;ystart],color=2,fill=2,alpha=0.3,
-        line=:path,subplot=subStart,label="")
-    plot!([10;15],[yend;yend],color=2,fill=2,alpha=0.3,
-        line=:path,subplot=subStart,label="")
+    plot!(plotTimeCourse,[drugTime[1];drugTime[2]],[ystart;ystart],color=2,fill=2,alpha=0.3,
+        line=:path,label="")
+    plot!(plotTimeCourse,[drugTime[1];drugTime[2]],[yend;yend],color=2,fill=2,alpha=0.3,
+        line=:path,label="")
 
     ## Scale Bars
-    plot!([9.3,9.3],[1;2],color=:gray40,lw=4,subplot=1+subStart,label="")
+    plot!(plotAv,[9.3,9.3],[0;1],color=:gray40,lw=4,label="")
     
     
-    pairPlot
+    [plotTimeCourse,plotAv]
 end
