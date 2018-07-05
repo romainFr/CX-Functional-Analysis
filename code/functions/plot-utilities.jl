@@ -12,7 +12,7 @@
 ## Extract the traces and stats corresponding to a cell pair, number of pulses and range of runs (to select non drug runs)
 function select_data(cellPair::Array{String},nPulses,data_dict,run_range,labbook,stats_per_run=stats_per_run)
     mini_labbook = labbook[findin(labbook[:cellToCell],cellPair),:]
-    sort!(mini_labbook,cols=:keyEntry)
+    sort!(mini_labbook,:keyEntry)
     pair_keys = mini_labbook[:keyEntry]
    
     mini_stats = stats_per_run[findin(stats_per_run[:experiment],pair_keys),:]
@@ -29,7 +29,7 @@ function select_data(cellPair::Array{String},nPulses,data_dict,run_range,labbook
             for i in 1:size(mini_stats,1)],:]
   
     mini_labbook = mini_labbook[findin(pair_keys,mini_stats[:experiment]),:]
-    sort!(mini_labbook,cols=(:keyEntry))
+    sort!(mini_labbook,:keyEntry)
     genos=mini_labbook[:genotypeRegion]
     
     pair_keys = mini_stats[:experiment] 
