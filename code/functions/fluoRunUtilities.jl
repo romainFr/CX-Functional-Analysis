@@ -67,7 +67,7 @@ function getStatistics(runArray)
         integralToPeak = vec([sum(run[3..(peakTimes[i]+stimStart),i]-baseline[i],
                     1)[1]*periods[tt] for i in eachindex(peakTimes)])
         
-        repeatsCor = repeat([(sum(cor(run[3..3.66,:],1))-4)/12],inner=[4])  
+        repeatsCor = repeat([(sum(cor(run[3..3.66,:],1))-4)/12],inner=[length(peakTimes)])  
         ## Getting the mean correlation during the 
         ## stimulus during the 4 repeats as a measure 
         ## of reliability (it's the same value repeated here)
@@ -82,8 +82,8 @@ function getStatistics(runArray)
                                integralToPeakNorm,
                                peakFluo,peakTimes,peakFluoNorm,
                                repeatsCor,halfDecay,
-                               repeat([nPulses[tt]],inner=[4]),
-                               repeat([tt],inner=[4])],
+                               repeat([nPulses[tt]],inner=[length(integrals)]),
+                               repeat([tt],inner=[length(integrals)])],
                            [:baseline,
                             :integrals,
                             :integral_to_peak,

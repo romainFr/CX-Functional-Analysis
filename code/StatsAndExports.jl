@@ -8,7 +8,7 @@ using Distances,Bootstrap,StatsBase
 include("functions/fluoRunUtilities.jl")
 ## Load the labbook, the lines description table and the fluorescence data
 @load "data/labbookTable.jld2" labbook
-linesToType = CSV.read("LinesAndTypes.csv")
+linesToType = CSV.read("LinesAndTypes.csv",strings=:raw)
 full_data_dict = load("data/rawData.jld2");
 
 ## An per run average version of the fluorescence data (to make figures)
@@ -88,7 +88,7 @@ neuronTypes = OrderedDict(uniqueTypesUsed[i] =>
                                 "post_fine" => split(linesToType[findfirst(linesToType[:,Symbol("Type Description")].==uniqueTypesUsed[i]),
                 Symbol("Post regions fine")],","),
                                 "short_name" => linesToType[findfirst(linesToType[:,Symbol("Type Description")].==uniqueTypesUsed[i]),
-            Symbol("New Type Name")]) for i in 1:length(uniqueTypesUsed))
+                Symbol("New Type Name")]) for i in 1:length(uniqueTypesUsed))
 
 ## Using the annotation, establish if there's a potential overlap for every pair 
 stats_per_run[:overlapping]=
@@ -249,7 +249,7 @@ Dict(exp =>  Dict(string(n) =>
 ## A table of drivers, used by the website
 drivers = Dict(td => convert(Array,
                              linesToType[linesToType[Symbol("Type Description")].== td,:Line]) for 
-               td in unique(linesToType[Symbol("Type Description")]));
+                             td in unique(linesToType[Symbol("Type Description")]));
 writeJS("js/drivers.js","DRIVERS",drivers)
 
 writeJS("js/perRunData.js","PER_RUN_DATA",perRunDataDict)

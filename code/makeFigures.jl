@@ -2,7 +2,7 @@
 using GroupedErrors
 using JLD2,DataFrames,AxisArrays,CSV,FileIO
 using PlotUtils, RecipesBase, StatPlots, StatsBase
-using LaTeXStrings, Measures, CSV
+using LaTeXStrings, Measures, CSV, Rsvg
 
 myPalette = [colorant"#94a6fd",
              colorant"#841ea4",
@@ -31,7 +31,7 @@ avg_data_dict = load("data/avgData.jld2")
 @load "data/drugTables.jld2"
 interpData = load("data/interpolatedData.jld2")
 
-linesToType = CSV.read("LinesAndTypes.csv",weakrefstrings=false)
+linesToType = CSV.read("LinesAndTypes.csv",strings=:raw)
 
 cellPairs = sort(unique(labbook[ismissing.(labbook[:TAGS]),:cellToCell]))
 genotypes = sort(unique(labbook[ismissing.(labbook[:TAGS]),:genotypeRegion]));

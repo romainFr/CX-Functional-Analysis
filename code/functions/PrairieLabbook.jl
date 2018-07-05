@@ -1,16 +1,15 @@
 
 ### Import the labbook table selecting certain values for a sub-table (returns two dataframes, the full one and the subset).
 function readLabbook(tablePath,lines;expDay=nothing,tagExcl=":Problematic:",dateFmt="yyyy-mm-dd e")
-    labTable = CSV.read(tablePath,missingstring="NA",dateformat=dateFmt,weakrefstrings=false,quotechar=''',allowmissing=:auto)#readtable(tablePath,nastrings=["NA"])
+    labTable = CSV.read(tablePath,null="NA",dateformat=dateFmt,strings=:raw,quotechar=''')#readtable(tablePath,nastrings=["NA"])
 
     labTable[:folderName] = lowercase.(Dates.format(labTable[:TIMESTAMP],"uddyy"))
     labTable[:Runs] = collect(vcat(eval(parse(x))...) for x in Missings.replace(labTable[:Runs],"[0]"))
     labTable[:Region] = collect(eval(parse(x)) for x in Missings.replace(labTable[:Region],"Dict(\"Missing\" => [0])"))
     
     labTableFinal = similar(labTable,0)[:,names(labTable) .!= :Region]
-    labTableFinal[:Region]="Missing"
-    labTableFinal[:RegionRuns] = Missings.missing
-    
+    labTableFinal[:Region] = Void
+        
     for fly in 1:size(labTable)[1]
         for reg in 1:length(labTable[:Region][fly])
             labLine = labTable[fly,names(labTable) .!= :Region]
@@ -25,9 +24,9 @@ function readLabbook(tablePath,lines;expDay=nothing,tagExcl=":Problematic:",date
     labTable = labbook_extend(labTable,lines)
     
     if typeof(expDay)==Void
-        subsetTable = labTable[find(Missings.replace(labTable[:TAGS].!=tagExcl,true)),:]
+        subsetTable = labTable
     else
-        subsetTable = labTable[[in(x,expDay)::Bool for x in labTable[:folderName]] .& collect(Missings.replace(labTable[:TAGS].!=tagExcl,true)),:]
+        subsetTable = labTable[[in(x,expDay)::Bool for x in labTable[:folderName]],:]
     end
     return((labTable,subsetTable))
 end
@@ -178,7 +177,7 @@ function labbook_extend(labbook_table,linesToType)
                                                               linesToType[:Line] .== labbook_table[:driverPre][i]][1]  for
                                                           i in 1:size(labbook_table,1)]
     labbook_table[:cellPost] = [linesToType[Symbol("Type Description")][
-                                                               linesToType[:Line] .== labbook_table[:driverPost][i]][1] 
+                                                               linesToType[:Line] .== labbook_table[:driverPost][i]][1]
                                 for i in 1:size(labbook_table,1)]
     labbook_table[:cellToCell] = labbook_table[:cellPre] .*"-to-".* labbook_table[:cellPost]
     ## We use the unique run numbers to identidy the flies, as several regions might have 

@@ -41,7 +41,7 @@ end
 
 problemFolders = String[]
 
-linesToType = CSV.read("LinesAndTypes.csv")
+linesToType = CSV.read("LinesAndTypes.csv",stings=:raw)
 (mainTab,subTab) = readLabbook(tablePath,linesToType,expDay=expday)
 
 if toUpdate == false
@@ -55,6 +55,14 @@ end
 for i in (1:size(subTab)[1])
     fly = makeflyDict(subTab[i,:],dataFolder=baseDataFolder);
 
+    info(subTab[i,:keyEntry])
+
+    if length(fly) == 0
+        println("Nothing in there")
+        push!(problemFolders,subTab[i,:keyEntry])
+        continue
+    end
+    
     pockelsParams = [fly[i]["globalConfig"]["laserPower_0"] for i in eachindex(fly)]
 
     if (!ismissing(subTab[i,:][:Drug][1]))
@@ -63,13 +71,7 @@ for i in (1:size(subTab)[1])
         drugStart = Missings.missing
     end
 
-    info(subTab[i,:keyEntry])
-
-    if length(fly) == 0
-        println("Nothing in there")
-        push!(problemFolders,subTab[i,:keyEntry])
-        continue
-    end
+ 
     ## Load all the data to get the baseline and the ROIs
     info("Load data")
     runFluos = map(fly) do run
