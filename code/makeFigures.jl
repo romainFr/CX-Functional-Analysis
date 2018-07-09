@@ -278,6 +278,8 @@ picroPlots = plot(
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.svg")
 PlotlyJS.savefig(picroPlots.o,"plots/picroPlots.html",js=:remote)
 
+
+## SI Figure : mixed effects of Delta7
 inhibPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-FBl3.b-NO2V.b"
 excitPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG2-9.s-EBt.b-NO1.b.Type1"
 mixedPair = "PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.b-EBw.s-DV_GA.b"
@@ -304,3 +306,25 @@ deltaFig = plot(deltaInhib,deltaExcit,deltaMixedP,layout=deltaL,size=(800,800),
 
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.svg")
 PlotlyJS.savefig(deltaFig.o,"plots/delta7SI.html",js=:remote)
+
+## SI figure : effect of genotypes
+## Extracting the pairs where this happens
+nGenoDf = by(labbook,:cellToCell,df -> length(unique(df[:LexA])))
+genoEffectPairs = nGenoDf[nGenoDf[:x1].>1,:cellToCell]
+
+genoEffectPlots = [make_raw_plot(select_data(cp,20,interpData,1:6,labbook),scalebar=false,colorV=:genotype,legendV=true,substract=false,pairTitle=true) for cp in genoEffectPairs]
+genoEffectPlots[2].subplots[1].attr[:yaxis][:guide] = "Fluorescence (ΔF/F₀)"
+
+genoEffectPlot = plot(genoEffectPlots[1],plot(),genoEffectPlots[2:end]...,layout=(3,2),size=(800,1000),link=:x,xlab="Time (s)")
+PlotlyJS.savefig(genoEffectPlot.o,"plots/genotypeEffectSI.svg")
+
+
+## SI figure : effect of region imaged
+nRegionDf = by(labbook,:genotype,df -> DataFrame(cellToCell =df[:cellToCell][1],nReg = length(unique(df[:Region]))*(size(df,1)>3))) 
+regionEffectPairs = nRegionDf[nRegionDf[:nReg].>1,:cellToCell]
+
+regionEffectPlots = [make_raw_plot(select_data(cp,20,interpData,1:6,labbook),scalebar=false,colorV=:region,legendV=true,substract=false,pairTitle=true) for cp in regionEffectPairs]
+regionEffectPlots[10].subplots[1].attr[:yaxis][:guide] = "Fluorescence (ΔF/F₀)"
+
+regionEffectPlot = plot(regionEffectPlots...,layout=(7,3),size=(1600,3500),link=:x,xlab="Time (s)")
+PlotlyJS.savefig(regionEffectPlot.o,"plots/regionEffectSI.svg")

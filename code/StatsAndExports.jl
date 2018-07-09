@@ -45,6 +45,7 @@ stats_per_run[:nPulses_median] = convert(Array{Int},stats_per_run[:nPulses_media
 ## Add some metadata columns 
 stats_per_run[:cellPair]=""
 stats_per_run[:genotype]=""
+stats_per_run[:region]=""
 stats_per_run[:preNeuron]=""
 stats_per_run[:postNeuron]=""
 stats_per_run[:preDrug]=true
@@ -53,6 +54,7 @@ stats_per_run[:timeToDrug]= -Inf
 for i in 1:size(stats_per_run,1)
     stats_per_run[i,:cellPair] = labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:cellToCell]
     stats_per_run[i,:genotype] = labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:genotypeRegion]
+    stats_per_run[i,:region] = labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:Region]
     stats_per_run[i,:preNeuron] = labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:cellPre]
     stats_per_run[i,:postNeuron] = labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:cellPost]
     if (!ismissing(labbook[findfirst(keyEntries.==stats_per_run[i,:experiment]),:Drug]))

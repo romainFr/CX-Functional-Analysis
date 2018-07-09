@@ -30,12 +30,11 @@ function select_data(cellPair::Array{String},nPulses,data_dict,run_range,labbook
   
     mini_labbook = mini_labbook[findin(pair_keys,mini_stats[:experiment]),:]
     sort!(mini_labbook,:keyEntry)
-    genos=mini_labbook[:genotypeRegion]
     
     pair_keys = mini_stats[:experiment] 
     mini_data = [get(data_dict,pair_keys[i],0)[mini_stats[:runIdx][i]][1] for 
                                                          i in eachindex(pair_keys)];
-    Dict("stats"=>mini_stats,"data"=>mini_data,"genotypes"=>genos)
+    Dict("stats"=>mini_stats,"data"=>mini_data)
 end
 
 function select_data(cellPair::String,nPulses,data_dict,run_range,labbook,stats_per_run=stats_per_run)
@@ -43,29 +42,44 @@ function select_data(cellPair::String,nPulses,data_dict,run_range,labbook,stats_
 end
 
 ### Plot using the output of the select_data function
-function make_raw_plot(dataset;substract=false,scalebar=true,scaley=3,np=20,colorV=:experiment,traceW=3,kwargs...) ## substract is a keyword argument deciding if the
+function make_raw_plot(dataset;substract=false,scalebar=true,scaley=3,np=20,colorV=:experiment,legendV=false,traceW=3,kwargs...) ## substract is a keyword argument deciding if the
                                                           ## baseline fluorescence is to be substracted for display
     p = plot(textcolor=RGB(128/255,128/255,128/255),guidecolor=RGB(128/255,128/255,128/255);kwargs...)
-    make_raw_plot!(p,dataset;substract=substract,scalebar=scalebar,scaley=scaley,np=np,colorV=colorV,traceW=traceW,kwargs...)
+    make_raw_plot!(p,dataset;substract=substract,scalebar=scalebar,scaley=scaley,np=np,colorV=colorV,legendV=legendV,traceW=traceW,kwargs...)
     p
 end
 
-function make_raw_plot!(p,dataset;substract=false,scalebar=true,scaley=3,np=20,colorV=:experiment,traceW=3,kwargs...) ## substract is a keyword argument deciding if the
+function make_raw_plot!(p,dataset;substract=false,scalebar=true,scaley=3,np=20,colorV=:experiment,legendV=false,pairTitle=false,traceW=3,kwargs...) ## substract is a keyword argument deciding if the
                                                           ## baseline fluorescence is to be substracted for display
     topvalue = 0
     colorsVIdx = unique(dataset["stats"][colorV])
+
+    if pairTitle
+        plot!(p,title=dataset["stats"][:shortPair][1])
+    end
+ 
+        
     for i in 1:length(dataset["data"])
         d = copy(dataset["data"][i])
         if substract 
             d[:] = d .- dataset["stats"][:baseline_median][i]
         end
-        plot!(p,d,color=find(colorsVIdx.==dataset["stats"][colorV][i])[1],legend=false,alpha=0.8,
-            lw=traceW;kwargs...)
+        plot!(p,d,color=find(colorsVIdx.==dataset["stats"][colorV][i])[1],alpha=0.8,
+            lw=traceW,label="";kwargs...)
         topvalue = max(maximum(d),topvalue)
     end
-    plot!(p,[0;0.033*np],[topvalue+0.5;topvalue+0.5],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path;kwargs...)
+
+    
+    if legendV
+        colorsVI = [findfirst(dataset["stats"][colorV],g) for g in colorsVIdx]
+        println(colorsVIdx)
+        for i in 1:length(colorsVI)
+            p.subplots[1].series_list[colorsVI[i]][:label] = colorsVIdx[i]
+        end
+    end
+    plot!(p,[0;0.033*np],[topvalue+0.5;topvalue+0.5],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path,label="";kwargs...)
     if scalebar
-        plot!(p,[6;8],[scaley-1;scaley-1],color=:gray50,line=:path,lw=3;kwargs...)
+        plot!(p,[6;8],[scaley-1;scaley-1],color=:gray50,line=:path,lw=3,label="";kwargs...)
     end
 end
 
