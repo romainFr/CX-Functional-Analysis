@@ -5,7 +5,7 @@ using JSON
 using DataStructures
 using Distances,Bootstrap,StatsBase
 
-include("functions/fluoRunUtilities.jl")
+include("code/functions/fluoRunUtilities.jl")
 ## Load the labbook, the lines description table and the fluorescence data
 @load "data/labbookTable.jld2" labbook
 linesToType = CSV.read("LinesAndTypes.csv",strings=:raw)
@@ -262,3 +262,7 @@ writeJS("js/mecaData.js","MECA_DATA",mecaDataDict)
 writeJS("js/picroData.js","PICRO_DATA",picroDataDict)
                     
 
+## Exporting a small labbook for paper SI
+sort!(labbook,:cellToCell)
+labbook_mini = DataFrame(Cell_Pair = labbook[:cellToCell],genotype = labbook[:genotype],region_imaged = labbook[:Region],data_folder = labbook[:folderName],stack_number = labbook[:Stack])
+CSV.write("data/labbook_small.csv",labbook_mini)

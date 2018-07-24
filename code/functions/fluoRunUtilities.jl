@@ -222,7 +222,7 @@ function addDistances!(statDf,stats_to_use,signVariable)
     statDf
 end
 
-## A function to aggregate stats for a group of runs (for example for a cell pair) TO MOVE TO FUNC CONN PACKAGE ?
+## A function to aggregate stats for a group of runs (for example for a cell pair) T
 function category_stats(df)
     ## Calculate the between run correlations for a given pair/genotype
     avg_data = vcat([interpolated_data_dict[exp][df[df[:experiment].==exp,:runIdx]] for 
