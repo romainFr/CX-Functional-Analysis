@@ -57,22 +57,22 @@ pairs_for_figureResp = Dict([("vi","PB18.s-GxΔ7Gy.b-PB18.s-9i1i8c.b-to-PBG1-8.s
                          ])
 
 
-excPlot = make_raw_plot(select_data(pairs_for_figureResp["i"],20,interpData,1:6,labbook),substract=true,framestyle=:axes,axis=:y,link=:x)
+excPlot = make_raw_plot(select_data(pairs_for_figureResp["i"],20,interpData,1:6,labbook),substract=true,framestyle=:axes,axis=:y,link=:x,yticks=[0;5;10])
 
 inhPlot = make_raw_plot(select_data(pairs_for_figureResp["ii"],20,interpData,1:6,labbook),scalebar=false,
-    framestyle=:axes,axis=:y,link=:x)
+    framestyle=:axes,axis=:y,link=:x,yticks=[0;1;2])
 
 weakPlot = make_raw_plot(select_data(pairs_for_figureResp["iii"],20,interpData,1:6,labbook),scaley=1.5,
-    substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x)
+    substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[0;0.2;0.4])
 
 confPlot = make_raw_plot(select_data(pairs_for_figureResp["iv"],20,interpData,1:6,labbook),
-    substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x)
+    substract=true,scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[0;0.2;0.4])
  
 reboundPlot = make_raw_plot(select_data(pairs_for_figureResp["v"],20,interpData,1:6,labbook),substract=true,
    scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[0;1.5;3])
 
 nothingPlot = make_raw_plot(select_data(pairs_for_figureResp["vi"],20,interpData,1:6,labbook),substract=true,
-    scalebar=false,framestyle=:axes,axis=:y,link=:x)
+    scalebar=false,framestyle=:axes,axis=:y,link=:x,yticks=[-0.1;0;0.1])
    
 direct_pair = "PBG1-7.s-FBl2.s-LAL.b-cre.b-to-PBG1-7.s-FBl2.s-LAL.b-cre.b"
 direct = make_raw_plot(select_data(direct_pair,20,interpData,1:6,labbook),substract=true,

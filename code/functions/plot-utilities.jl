@@ -77,7 +77,7 @@ function make_raw_plot!(p,dataset;substract=false,scalebar=true,scaley=3,np=20,c
             p.subplots[1].series_list[colorsVI[i]][:label] = colorsVIdx[i]
         end
     end
-    plot!(p,[0;0.033*np],[topvalue+0.5;topvalue+0.5],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path,label="";kwargs...)
+    plot!(p,[0;0.033*np],[topvalue;topvalue],color=:gray80,fill=:gray80,alpha=0.4,fillrange=0,line=:path,label="";kwargs...)
     if scalebar
         plot!(p,[6;8],[scaley-1;scaley-1],color=:gray50,line=:path,lw=3,label="";kwargs...)
     end
