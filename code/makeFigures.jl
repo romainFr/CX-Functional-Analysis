@@ -123,18 +123,18 @@ PlotlyJS.savefig(figureResponseD.o,"plots/figureResponsesD.html",js=:remote)
 
 
 
-fullNamesDF = DataFrame(integNorm = "Normalized integral", 
+fullNamesDF = DataFrame(integNorm = "Normalized integral (s)", 
                         integNormScaled = "Scaled normalized integral",
                         peakNorm = "Normalized peak",
-                        peakFluo = "Peak fluorescence",
-                        integ = "Integral",
-                        decay_time = "Decay half time",
-                        peakTime = "Rise time",
+                        peakFluo = "Peak fluorescence (ΔF/F₀)",
+                        integ = "Integral (ΔF/F₀)s",
+                        decay_time = "Decay half time (s)",
+                        peakTime = "Rise time (s)",
                         repeats_corr = "Repeat to repeat correlations",
                         between_runs_corr = "Correlations between experiments",
                         state_dependence_integral = "Integral to baseline correlation",
                         state_dependence = "Distance to baseline correlation",
-                        distance = "Distance",
+                        distance = "Mahalanobis distance",
                         responding = "Responding");
  
 
@@ -163,13 +163,13 @@ PlotlyJS.savefig(matDistance.o,"plots/matDistance.html",js=:remote)
 
 ## Baseline effects
 baselineDists = @df stats_per_run[stats_per_run[:preDrug],:] boxplot(:cellPair,:baseline_median,
-    size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline",
+    size=(800,300),ylims=(0,10),group=:expType,ylabel="Single run baseline (ΔF/F₀)",
                                                                      whisker_width=0.5,xticks=[],
                                                                      linecolor=:gray50,markersize=2,alpha=0.8,malpha=0.6,
                                                                      hover=:cellPair,legend=(0.35,0.92),color=[1 6 9])
 
 baselineDistsSummary = @df stats_per_run[stats_per_run[:preDrug],:] violin(:expType,:baseline_median,
-    size=(350,300),ylabel="Single run baseline",ylims=(0,10),legend=:none,color="gray80",label="")
+    size=(350,300),ylabel="Single run baseline (ΔF/F₀)",ylims=(0,10),legend=:none,color="gray80",label="")
 
 stateDependenceSummary = @df stats_per_pair_20 boxplot(:globalSignif,
     :state_dependence_integral,
@@ -199,8 +199,8 @@ push!(figureExampleState,
                                                     ,xlims=(0,1.7),label=""))
 
 plot(figureExampleState...,layout=(1,4),legend=false,msw=0,
-    ylab=["Integral to peak" "" "" ""],
-    xlab="Baseline value",
+    ylab=["Integral to peak (ΔF/F₀)s" "" "" ""],
+    xlab="Baseline value (ΔF/F₀)",
     title=["i" "ii" "iii" "iv"],titleloc=:left,xrotation=45)
 
 l=@layout [a
