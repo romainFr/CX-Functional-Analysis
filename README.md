@@ -5,7 +5,7 @@ Code and instructions to reproduce all the analysis used to generate the figures
 
 ## Installation, prerequesites
 To run the analysis locally (recommended if you plan of analyzing a full dataset)
-- Download and install [Julia](https://julialang.org/downloads/)
+- Download and install [Julia](https://julialang.org/downloads/). This code has been written for Julia 0.6. More recent versions will likely fail for now.
 - Install the packages specified in the REQUIRE file (using ```Pkg.add("PkgName1","PkgName2",...)```)
 - At the Julia prompt, type :
 ```julia
